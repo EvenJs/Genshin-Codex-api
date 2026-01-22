@@ -1,0 +1,10 @@
+- Follow CLAUDE.md as the single source of truth.
+- Prefer minimal changes and avoid refactors unless requested.
+- Never generate code that breaks JWT account ownership validation.
+- Always use DTO + ValidationPipe patterns.
+- For bulk operations, use Prisma $transaction and idempotent upserts.
+- Follow CLAUDE.md as the single source of truth.
+- Prefer minimal changes and avoid refactors unless requested.
+- Never generate code that breaks JWT account ownership validation.
+- Always use DTO + ValidationPipe patterns.
+- For bulk operations, use Prisma $transaction and idempotent upserts.
