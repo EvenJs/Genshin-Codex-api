@@ -35,4 +35,18 @@ export class AccountsService {
       throw error;
     }
   }
+
+  async findAll(userId: string) {
+    return this.prisma.gameAccount.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        uid: true,
+        server: true,
+        nickname: true,
+        createdAt: true,
+      },
+    });
+  }
 }

@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from '../auth/current-user.decorator';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -12,6 +12,12 @@ import { CreateAccountDto } from './dto/create-account.dto';
 @Controller('accounts')
 export class AccountsController {
   constructor(private accountsService: AccountsService) {}
+
+  @ApiOperation({ summary: 'List all game accounts for current user' })
+  @Get()
+  findAll(@CurrentUser() user: JwtPayload) {
+    return this.accountsService.findAll(user.userId);
+  }
 
   @ApiOperation({ summary: 'Create a new game account' })
   @Post()
