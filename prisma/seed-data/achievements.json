@@ -1,0 +1,113 @@
+[
+    {
+      "id": "ach-001",
+      "name": "风起地的回忆",
+      "description": "在风起地的大树下停留片刻。",
+      "category": "探索",
+      "region": "蒙德",
+      "version": "1.0",
+      "isHidden": false,
+      "rewardPrimogems": 5,
+      "guide": "传送到风起地附近，走到大树下停留几秒即可触发。"
+    },
+    {
+      "id": "ach-002",
+      "name": "传送锚点初体验",
+      "description": "解锁任意一个传送锚点。",
+      "category": "探索",
+      "region": "通用",
+      "version": "1.0",
+      "isHidden": false,
+      "rewardPrimogems": 5,
+      "guide": "地图上找到未解锁的传送锚点，靠近互动解锁。"
+    },
+    {
+      "id": "ach-003",
+      "name": "烹饪新手",
+      "description": "制作 1 道料理。",
+      "category": "生活",
+      "region": "通用",
+      "version": "1.0",
+      "isHidden": false,
+      "rewardPrimogems": 5,
+      "guide": "任意烹饪锅处选择食谱制作一次即可。"
+    },
+    {
+      "id": "ach-004",
+      "name": "元素反应：超载",
+      "description": "触发 1 次「超载」反应。",
+      "category": "战斗",
+      "region": "通用",
+      "version": "1.0",
+      "isHidden": false,
+      "rewardPrimogems": 5,
+      "guide": "火元素 + 雷元素命中敌人即可触发超载。"
+    },
+    {
+      "id": "ach-005",
+      "name": "深境初探",
+      "description": "首次进入深境螺旋。",
+      "category": "挑战",
+      "region": "通用",
+      "version": "1.0",
+      "isHidden": false,
+      "rewardPrimogems": 10,
+      "guide": "从马斯克礁进入深境螺旋，完成首次进入。"
+    },
+    {
+      "id": "ach-006",
+      "name": "宝箱猎人",
+      "description": "开启 10 个宝箱。",
+      "category": "探索",
+      "region": "通用",
+      "version": "1.0",
+      "isHidden": false,
+      "rewardPrimogems": 10,
+      "guide": "在野外探索并开启任意宝箱累计达到 10。"
+    },
+    {
+      "id": "ach-007",
+      "name": "风之翼起飞",
+      "description": "使用风之翼滑翔一次。",
+      "category": "探索",
+      "region": "通用",
+      "version": "1.0",
+      "isHidden": false,
+      "rewardPrimogems": 5,
+      "guide": "从高处跳下后按滑翔键展开风之翼。"
+    },
+    {
+      "id": "ach-008",
+      "name": "每日委托：起步",
+      "description": "完成 1 次每日委托。",
+      "category": "日常",
+      "region": "通用",
+      "version": "1.0",
+      "isHidden": false,
+      "rewardPrimogems": 5,
+      "guide": "冒险之证/地图追踪任一委托任务并完成。"
+    },
+    {
+      "id": "ach-009",
+      "name": "隐藏的成就示例",
+      "description": "这是一个隐藏成就样例。",
+      "category": "隐藏",
+      "region": "通用",
+      "version": "1.0",
+      "isHidden": true,
+      "rewardPrimogems": 5,
+      "guide": "隐藏成就通常需要满足特定条件才会显示完成。"
+    },
+    {
+      "id": "ach-010",
+      "name": "尘歌壶：小憩",
+      "description": "进入尘歌壶一次。",
+      "category": "玩法",
+      "region": "通用",
+      "version": "1.5",
+      "isHidden": false,
+      "rewardPrimogems": 5,
+      "guide": "完成相关任务后，使用尘歌壶道具进入即可。"
+    }
+  ]
+  

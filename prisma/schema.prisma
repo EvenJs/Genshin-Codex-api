@@ -30,3 +30,22 @@ model GameAccount {
   @@unique([userId, uid, server])
   @@index([userId])
 }
+
+model Achievement {
+  id              String   @id
+  name            String
+  description     String
+  category        String
+  region          String
+  version         String?
+  isHidden        Boolean  @default(false)
+  rewardPrimogems Int      @default(0)
+  guide           String?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([category])
+  @@index([region])
+}
+
