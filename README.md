@@ -1,0 +1,1 @@
+# Genshin-Codex-api
