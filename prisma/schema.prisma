@@ -32,6 +32,7 @@ model GameAccount {
 
   user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   userAchievements UserAchievement[]
+  progress         AchievementProgress[]
 
   @@unique([userId, uid, server])
   @@index([userId])
@@ -51,6 +52,7 @@ model Achievement {
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
   userAchievements UserAchievement[]
+  progress         AchievementProgress[]
 
   @@index([category])
   @@index([region])
@@ -70,4 +72,20 @@ model UserAchievement {
 
   @@unique([accountId, achievementId])
   @@index([accountId])
+}
+
+model AchievementProgress {
+  id            String   @id @default(uuid())
+  accountId     String
+  achievementId String
+  completedAt   DateTime @default(now())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  account     GameAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  achievement Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+
+  @@unique([accountId, achievementId])
+  @@index([accountId])
+  @@index([achievementId])
 }

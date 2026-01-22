@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -9,6 +9,7 @@ import {
 import { CurrentUser } from '../auth/current-user.decorator';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { JwtPayload } from '../auth/jwt.strategy';
+import { BulkProgressDto } from './dto/bulk-progress.dto';
 import { UpdateProgressDto } from './dto/update-progress.dto';
 import { ProgressService } from './progress.service';
 
@@ -52,6 +53,25 @@ export class ProgressController {
       accountId,
       achievementId,
       dto.completed,
+    );
+  }
+
+  @ApiOperation({ summary: 'Bulk update achievement completion status' })
+  @ApiParam({ name: 'accountId', description: 'Game account ID' })
+  @ApiResponse({ status: 201, description: 'Bulk progress updated successfully' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Account belongs to another user' })
+  @ApiResponse({ status: 404, description: 'Account not found' })
+  @Post('bulk')
+  bulkUpdate(
+    @CurrentUser() user: JwtPayload,
+    @Param('accountId') accountId: string,
+    @Body() dto: BulkProgressDto,
+  ) {
+    return this.progressService.bulkUpdate(
+      user.userId,
+      accountId,
+      dto.completedIds,
     );
   }
 }

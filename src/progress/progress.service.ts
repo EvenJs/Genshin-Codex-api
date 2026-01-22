@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { AccountOwnershipService } from '../accounts/account-ownership.service';
 
@@ -12,14 +12,9 @@ export class ProgressService {
   async getCompletedIds(userId: string, accountId: string) {
     await this.ownership.validate(userId, accountId);
 
-    const records = await this.prisma.userAchievement.findMany({
-      where: {
-        accountId,
-        status: 'COMPLETED',
-      },
-      select: {
-        achievementId: true,
-      },
+    const records = await this.prisma.achievementProgress.findMany({
+      where: { accountId },
+      select: { achievementId: true },
     });
 
     return {
@@ -35,38 +30,40 @@ export class ProgressService {
   ) {
     await this.ownership.validate(userId, accountId);
 
-    // Validate achievement exists
-    const achievement = await this.prisma.achievement.findUnique({
-      where: { id: achievementId },
-    });
-    if (!achievement) {
-      throw new NotFoundException(`Achievement ${achievementId} not found`);
-    }
-
     if (completed) {
-      // Upsert completed record
-      await this.prisma.userAchievement.upsert({
-        where: {
-          accountId_achievementId: { accountId, achievementId },
-        },
-        create: {
-          accountId,
-          achievementId,
-          status: 'COMPLETED',
-          completedAt: new Date(),
-        },
-        update: {
-          status: 'COMPLETED',
-          completedAt: new Date(),
-        },
+      await this.prisma.achievementProgress.upsert({
+        where: { accountId_achievementId: { accountId, achievementId } },
+        create: { accountId, achievementId, completedAt: new Date() },
+        update: { completedAt: new Date() },
       });
     } else {
-      // Delete the record if exists
-      await this.prisma.userAchievement.deleteMany({
+      await this.prisma.achievementProgress.deleteMany({
         where: { accountId, achievementId },
       });
     }
 
     return { ok: true };
+  }
+
+  async bulkUpdate(userId: string, accountId: string, completedIds: string[]) {
+    await this.ownership.validate(userId, accountId);
+
+    if (completedIds.length === 0) {
+      return { ok: true, upserted: 0 };
+    }
+
+    const now = new Date();
+
+    await this.prisma.$transaction(
+      completedIds.map((achievementId) =>
+        this.prisma.achievementProgress.upsert({
+          where: { accountId_achievementId: { accountId, achievementId } },
+          create: { accountId, achievementId, completedAt: now },
+          update: { completedAt: now },
+        }),
+      ),
+    );
+
+    return { ok: true, upserted: completedIds.length };
   }
 }
