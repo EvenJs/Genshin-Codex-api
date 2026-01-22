@@ -3,6 +3,7 @@ import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { AccountOwnershipService } from './account-ownership.service';
 import { CreateAccountDto } from './dto/create-account.dto';
+import { UpdateAccountDto } from './dto/update-account.dto';
 
 @Injectable()
 export class AccountsService {
@@ -50,6 +51,21 @@ export class AccountsService {
         server: true,
         nickname: true,
         createdAt: true,
+      },
+    });
+  }
+
+  async update(userId: string, accountId: string, dto: UpdateAccountDto) {
+    await this.ownership.validate(userId, accountId);
+
+    return this.prisma.gameAccount.update({
+      where: { id: accountId },
+      data: { nickname: dto.nickname },
+      select: {
+        id: true,
+        uid: true,
+        server: true,
+        nickname: true,
       },
     });
   }
