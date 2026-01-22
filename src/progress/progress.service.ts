@@ -1,6 +1,11 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { AccountOwnershipService } from '../accounts/account-ownership.service';
+import {
+  ListAccountAchievementsQueryDto,
+  ProgressStatusFilter,
+} from './dto/list-account-achievements.query.dto';
 
 @Injectable()
 export class ProgressService {
@@ -65,5 +70,105 @@ export class ProgressService {
     );
 
     return { ok: true, upserted: completedIds.length };
+  }
+
+  async listWithProgress(
+    userId: string,
+    accountId: string,
+    query: ListAccountAchievementsQueryDto,
+  ) {
+    await this.ownership.validate(userId, accountId);
+
+    const { page, pageSize, status, category, region, isHidden, version, q } = query;
+
+    // Get all completed achievement IDs for this account
+    const completedRecords = await this.prisma.achievementProgress.findMany({
+      where: { accountId },
+      select: { achievementId: true, completedAt: true },
+    });
+    const completedMap = new Map(
+      completedRecords.map((r) => [r.achievementId, r.completedAt]),
+    );
+
+    // Build base where clause for achievements
+    const baseWhere: Prisma.AchievementWhereInput = {
+      ...(category ? { category } : {}),
+      ...(region ? { region } : {}),
+      ...(version ? { version } : {}),
+      ...(typeof isHidden === 'boolean' ? { isHidden } : {}),
+      ...(q
+        ? {
+            OR: [
+              { name: { contains: q, mode: 'insensitive' } },
+              { description: { contains: q, mode: 'insensitive' } },
+            ],
+          }
+        : {}),
+    };
+
+    // Apply status filter
+    let where: Prisma.AchievementWhereInput = baseWhere;
+    const completedIds = [...completedMap.keys()];
+
+    if (status === ProgressStatusFilter.COMPLETED) {
+      where = { ...baseWhere, id: { in: completedIds } };
+    } else if (status === ProgressStatusFilter.INCOMPLETE) {
+      where = { ...baseWhere, id: { notIn: completedIds } };
+    }
+
+    const skip = (page - 1) * pageSize;
+
+    // Get paginated items and total
+    const [items, total] = await this.prisma.$transaction([
+      this.prisma.achievement.findMany({
+        where,
+        skip,
+        take: pageSize,
+        orderBy: [{ category: 'asc' }, { name: 'asc' }],
+      }),
+      this.prisma.achievement.count({ where }),
+    ]);
+
+    // Get stats (based on baseWhere, not status filter)
+    const [totalCount, allAchievements] = await this.prisma.$transaction([
+      this.prisma.achievement.count({ where: baseWhere }),
+      this.prisma.achievement.findMany({
+        where: baseWhere,
+        select: { id: true, rewardPrimogems: true },
+      }),
+    ]);
+
+    const completedCount = allAchievements.filter((a) =>
+      completedMap.has(a.id),
+    ).length;
+    const incompleteCount = totalCount - completedCount;
+    const primogemsEarned = allAchievements
+      .filter((a) => completedMap.has(a.id))
+      .reduce((sum, a) => sum + a.rewardPrimogems, 0);
+    const primogemsTotal = allAchievements.reduce(
+      (sum, a) => sum + a.rewardPrimogems,
+      0,
+    );
+
+    // Map items with completion status
+    const itemsWithProgress = items.map((achievement) => ({
+      ...achievement,
+      completed: completedMap.has(achievement.id),
+      completedAt: completedMap.get(achievement.id) ?? null,
+    }));
+
+    return {
+      items: itemsWithProgress,
+      total,
+      page,
+      pageSize,
+      stats: {
+        completedCount,
+        incompleteCount,
+        totalCount,
+        primogemsEarned,
+        primogemsTotal,
+      },
+    };
   }
 }
