@@ -5,6 +5,7 @@ import { AchievementsModule } from './achievements/achievements.module';
 import { AuthModule } from './auth/auth.module';
 import { HealthController } from './health/health.controller';
 import { PrismaModule } from './prisma/prisma.module';
+import { ProgressModule } from './progress/progress.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { PrismaModule } from './prisma/prisma.module';
     AuthModule,
     AccountsModule,
     AchievementsModule,
+    ProgressModule,
   ],
   controllers: [HealthController],
 })
