@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from '../auth/current-user.decorator';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -23,5 +31,11 @@ export class AccountsController {
   @Post()
   create(@CurrentUser() user: JwtPayload, @Body() dto: CreateAccountDto) {
     return this.accountsService.create(user.userId, dto);
+  }
+
+  @ApiOperation({ summary: 'Delete a game account' })
+  @Delete(':id')
+  remove(@CurrentUser() user: JwtPayload, @Param('id') id: string) {
+    return this.accountsService.remove(user.userId, id);
   }
 }
