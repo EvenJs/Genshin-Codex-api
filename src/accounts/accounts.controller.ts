@@ -8,7 +8,13 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { CurrentUser } from '../auth/current-user.decorator';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { JwtPayload } from '../auth/jwt.strategy';
@@ -49,5 +55,16 @@ export class AccountsController {
   @Delete(':id')
   remove(@CurrentUser() user: JwtPayload, @Param('id') id: string) {
     return this.accountsService.remove(user.userId, id);
+  }
+
+  @ApiOperation({ summary: 'Get full achievement stats for an account' })
+  @ApiParam({ name: 'id', description: 'Game account ID' })
+  @ApiResponse({ status: 200, description: 'Account achievement stats' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Account belongs to another user' })
+  @ApiResponse({ status: 404, description: 'Account not found' })
+  @Get(':id/stats')
+  getStats(@CurrentUser() user: JwtPayload, @Param('id') id: string) {
+    return this.accountsService.getStats(user.userId, id);
   }
 }

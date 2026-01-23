@@ -79,4 +79,38 @@ export class AccountsService {
 
     return { ok: true };
   }
+
+  async getStats(userId: string, accountId: string) {
+    await this.ownership.validate(userId, accountId);
+
+    const [completedCount, totalAchievements, completedProgress] =
+      await this.prisma.$transaction([
+        this.prisma.achievementProgress.count({
+          where: { accountId },
+        }),
+        this.prisma.achievement.aggregate({
+          _count: true,
+          _sum: { rewardPrimogems: true },
+        }),
+        this.prisma.achievementProgress.findMany({
+          where: { accountId },
+          select: { achievement: { select: { rewardPrimogems: true } } },
+        }),
+      ]);
+
+    const totalCount = totalAchievements._count;
+    const primogemsTotal = totalAchievements._sum.rewardPrimogems ?? 0;
+    const primogemsEarned = completedProgress.reduce(
+      (sum, p) => sum + p.achievement.rewardPrimogems,
+      0,
+    );
+
+    return {
+      completedCount,
+      totalCount,
+      incompleteCount: totalCount - completedCount,
+      primogemsEarned,
+      primogemsTotal,
+    };
+  }
 }
