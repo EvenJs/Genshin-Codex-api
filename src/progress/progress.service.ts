@@ -86,9 +86,7 @@ export class ProgressService {
       where: { accountId },
       select: { achievementId: true, completedAt: true },
     });
-    const completedMap = new Map(
-      completedRecords.map((r) => [r.achievementId, r.completedAt]),
-    );
+    const completedMap = new Map(completedRecords.map((r) => [r.achievementId, r.completedAt]));
 
     // Build base where clause for achievements
     const baseWhere: Prisma.AchievementWhereInput = {
@@ -130,17 +128,16 @@ export class ProgressService {
     ]);
 
     // Get stats (全量统计，不受 filter 影响)
-    const [totalAchievements, completedProgressWithRewards] =
-      await this.prisma.$transaction([
-        this.prisma.achievement.aggregate({
-          _count: true,
-          _sum: { rewardPrimogems: true },
-        }),
-        this.prisma.achievementProgress.findMany({
-          where: { accountId },
-          select: { achievement: { select: { rewardPrimogems: true } } },
-        }),
-      ]);
+    const [totalAchievements, completedProgressWithRewards] = await this.prisma.$transaction([
+      this.prisma.achievement.aggregate({
+        _count: true,
+        _sum: { rewardPrimogems: true },
+      }),
+      this.prisma.achievementProgress.findMany({
+        where: { accountId },
+        select: { achievement: { select: { rewardPrimogems: true } } },
+      }),
+    ]);
 
     const totalCount = totalAchievements._count;
     const primogemsTotal = totalAchievements._sum.rewardPrimogems ?? 0;

@@ -3,7 +3,6 @@ import { AchievementsController } from './achievements.controller';
 import { AchievementsService } from './achievements.service';
 
 @Module({
-
   controllers: [AchievementsController],
   providers: [AchievementsService],
   exports: [AchievementsService],

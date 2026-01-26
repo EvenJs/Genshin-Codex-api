@@ -29,10 +29,7 @@ export class AccountsService {
         },
       });
     } catch (error) {
-      if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2002'
-      ) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
         throw new ConflictException(
           `Account with UID ${dto.uid} on server ${dto.server} already exists`,
         );
@@ -83,20 +80,19 @@ export class AccountsService {
   async getStats(userId: string, accountId: string) {
     await this.ownership.validate(userId, accountId);
 
-    const [completedCount, totalAchievements, completedProgress] =
-      await this.prisma.$transaction([
-        this.prisma.achievementProgress.count({
-          where: { accountId },
-        }),
-        this.prisma.achievement.aggregate({
-          _count: true,
-          _sum: { rewardPrimogems: true },
-        }),
-        this.prisma.achievementProgress.findMany({
-          where: { accountId },
-          select: { achievement: { select: { rewardPrimogems: true } } },
-        }),
-      ]);
+    const [completedCount, totalAchievements, completedProgress] = await this.prisma.$transaction([
+      this.prisma.achievementProgress.count({
+        where: { accountId },
+      }),
+      this.prisma.achievement.aggregate({
+        _count: true,
+        _sum: { rewardPrimogems: true },
+      }),
+      this.prisma.achievementProgress.findMany({
+        where: { accountId },
+        select: { achievement: { select: { rewardPrimogems: true } } },
+      }),
+    ]);
 
     const totalCount = totalAchievements._count;
     const primogemsTotal = totalAchievements._sum.rewardPrimogems ?? 0;

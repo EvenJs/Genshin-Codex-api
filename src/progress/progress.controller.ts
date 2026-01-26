@@ -1,11 +1,5 @@
 import { Body, Controller, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
-import {
-  ApiBearerAuth,
-  ApiOperation,
-  ApiParam,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from '../auth/current-user.decorator';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { JwtPayload } from '../auth/jwt.strategy';
@@ -27,10 +21,7 @@ export class ProgressController {
   @ApiResponse({ status: 403, description: 'Account belongs to another user' })
   @ApiResponse({ status: 404, description: 'Account not found' })
   @Get()
-  getProgress(
-    @CurrentUser() user: JwtPayload,
-    @Param('accountId') accountId: string,
-  ) {
+  getProgress(@CurrentUser() user: JwtPayload, @Param('accountId') accountId: string) {
     return this.progressService.getCompletedIds(user.userId, accountId);
   }
 
@@ -68,10 +59,6 @@ export class ProgressController {
     @Param('accountId') accountId: string,
     @Body() dto: BulkProgressDto,
   ) {
-    return this.progressService.bulkUpdate(
-      user.userId,
-      accountId,
-      dto.completedIds,
-    );
+    return this.progressService.bulkUpdate(user.userId, accountId, dto.completedIds);
   }
 }

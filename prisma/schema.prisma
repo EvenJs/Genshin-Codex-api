@@ -7,18 +7,27 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum ProgressStatus {
-  COMPLETED
-  NOT_COMPLETED
+model User {
+  id            String         @id @default(uuid())
+  email         String         @unique
+  passwordHash  String
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  gameAccounts  GameAccount[]
+  refreshTokens RefreshToken[]
 }
 
-model User {
-  id           String        @id @default(uuid())
-  email        String        @unique
-  passwordHash String
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  gameAccounts GameAccount[]
+model RefreshToken {
+  id        String   @id @default(uuid())
+  userId    String
+  tokenHash String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
 }
 
 model GameAccount {
@@ -30,9 +39,8 @@ model GameAccount {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userAchievements UserAchievement[]
-  progress         AchievementProgress[]
+  user     User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  progress AchievementProgress[]
 
   @@unique([userId, uid, server])
   @@index([userId])
@@ -49,29 +57,12 @@ model Achievement {
   rewardPrimogems Int      @default(0)
   guide           String?
 
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
-  userAchievements UserAchievement[]
-  progress         AchievementProgress[]
+  createdAt DateTime              @default(now())
+  updatedAt DateTime              @updatedAt
+  progress  AchievementProgress[]
 
   @@index([category])
   @@index([region])
-}
-
-model UserAchievement {
-  id            String         @id @default(uuid())
-  accountId     String
-  achievementId String
-  status        ProgressStatus @default(NOT_COMPLETED)
-  completedAt   DateTime?
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-
-  account     GameAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
-  achievement Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
-
-  @@unique([accountId, achievementId])
-  @@index([accountId])
 }
 
 model AchievementProgress {
