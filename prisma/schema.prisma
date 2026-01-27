@@ -39,8 +39,10 @@ model GameAccount {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user     User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  progress AchievementProgress[]
+  user       User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  progress   AchievementProgress[]
+  artifacts  UserArtifact[]
+  characters AccountCharacter[]
 
   @@unique([userId, uid, server])
   @@index([userId])
@@ -79,4 +81,110 @@ model AchievementProgress {
   @@unique([accountId, achievementId])
   @@index([accountId])
   @@index([achievementId])
+}
+
+// ==================== 圣遗物系统 ====================
+
+enum ArtifactSlot {
+  FLOWER // 生之花
+  PLUME // 死之羽
+  SANDS // 时之沙
+  GOBLET // 空之杯
+  CIRCLET // 理之冠
+}
+
+model ArtifactSet {
+  id             String   @id
+  name           String
+  rarity         Int[] // 支持的稀有度 [4, 5] 或 [1, 2, 3] 等
+  twoPieceBonus  String // 2件套效果
+  fourPieceBonus String? // 4件套效果 (部分套装没有)
+  imageUrl       String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  artifacts UserArtifact[]
+
+  @@index([name])
+}
+
+model UserArtifact {
+  id           String       @id @default(uuid())
+  accountId    String
+  setId        String
+  slot         ArtifactSlot
+  mainStat     String // 主属性类型 (HP, ATK, DEF, HP%, ATK%, DEF%, EM, ER%, Crit Rate%, Crit DMG%, Healing%, Elemental DMG%)
+  mainStatValue Float       // 主属性数值
+  subStats     Json         // 副属性数组 [{stat: string, value: number}]
+  level        Int          @default(0) // 0-20
+  rarity       Int          // 1-5星
+  locked       Boolean      @default(false)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  account          GameAccount       @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  set              ArtifactSet       @relation(fields: [setId], references: [id])
+  equippedBy       AccountCharacter? @relation(fields: [equippedById], references: [id], onDelete: SetNull)
+  equippedById     String?
+
+  @@index([accountId])
+  @@index([setId])
+  @@index([slot])
+  @@index([equippedById])
+}
+
+// ==================== 角色系统 ====================
+
+enum Element {
+  PYRO // 火
+  HYDRO // 水
+  ANEMO // 风
+  ELECTRO // 雷
+  DENDRO // 草
+  CRYO // 冰
+  GEO // 岩
+}
+
+enum WeaponType {
+  SWORD // 单手剑
+  CLAYMORE // 双手剑
+  POLEARM // 长柄武器
+  BOW // 弓
+  CATALYST // 法器
+}
+
+model Character {
+  id         String     @id
+  name       String
+  element    Element
+  weaponType WeaponType
+  rarity     Int // 4 或 5
+  region     String? // 蒙德、璃月、稻妻、须弥、枫丹、纳塔
+  imageUrl   String?
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  accountCharacters AccountCharacter[]
+
+  @@index([element])
+  @@index([weaponType])
+  @@index([rarity])
+}
+
+model AccountCharacter {
+  id            String   @id @default(uuid())
+  accountId     String
+  characterId   String
+  level         Int      @default(1) // 1-90
+  constellation Int      @default(0) // 0-6
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  account   GameAccount    @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  character Character      @relation(fields: [characterId], references: [id])
+  artifacts UserArtifact[]
+
+  @@unique([accountId, characterId])
+  @@index([accountId])
+  @@index([characterId])
 }

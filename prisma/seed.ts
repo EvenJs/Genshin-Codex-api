@@ -14,6 +14,15 @@ type AchievementSeed = {
   guide?: string | null;
 };
 
+type ArtifactSetSeed = {
+  id: string;
+  name: string;
+  rarity: number[];
+  twoPieceBonus: string;
+  fourPieceBonus?: string | null;
+  imageUrl?: string | null;
+};
+
 const prisma = new PrismaClient();
 
 function readJsonFile<T>(filePath: string): T {
@@ -21,12 +30,12 @@ function readJsonFile<T>(filePath: string): T {
   return JSON.parse(raw) as T;
 }
 
-async function main() {
+async function seedAchievements() {
   const dataPath = path.resolve(__dirname, 'seed-data', 'achievements.json');
   const achievements = readJsonFile<AchievementSeed[]>(dataPath);
 
   if (!Array.isArray(achievements)) {
-    throw new Error('Seed data is not an array.');
+    throw new Error('Achievements seed data is not an array.');
   }
 
   await prisma.$transaction(
@@ -59,6 +68,45 @@ async function main() {
   );
 
   console.log(`Seeded achievements: ${achievements.length}`);
+}
+
+async function seedArtifactSets() {
+  const dataPath = path.resolve(__dirname, 'seed-data', 'artifact-sets.json');
+  const artifactSets = readJsonFile<ArtifactSetSeed[]>(dataPath);
+
+  if (!Array.isArray(artifactSets)) {
+    throw new Error('Artifact sets seed data is not an array.');
+  }
+
+  await prisma.$transaction(
+    artifactSets.map((s) =>
+      prisma.artifactSet.upsert({
+        where: { id: s.id },
+        update: {
+          name: s.name,
+          rarity: s.rarity,
+          twoPieceBonus: s.twoPieceBonus,
+          fourPieceBonus: s.fourPieceBonus ?? null,
+          imageUrl: s.imageUrl ?? null
+        },
+        create: {
+          id: s.id,
+          name: s.name,
+          rarity: s.rarity,
+          twoPieceBonus: s.twoPieceBonus,
+          fourPieceBonus: s.fourPieceBonus ?? null,
+          imageUrl: s.imageUrl ?? null
+        }
+      })
+    )
+  );
+
+  console.log(`Seeded artifact sets: ${artifactSets.length}`);
+}
+
+async function main() {
+  await seedAchievements();
+  await seedArtifactSets();
 }
 
 main()

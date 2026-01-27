@@ -1,0 +1,345 @@
+[
+  {
+    "id": "gladiators_finale",
+    "name": "角斗士的终幕礼",
+    "rarity": [4, 5],
+    "twoPieceBonus": "攻击力提高18%",
+    "fourPieceBonus": "装备该圣遗物套装的角色为单手剑、双手剑、长柄武器角色时，角色普通攻击造成的伤害提高35%"
+  },
+  {
+    "id": "wanderers_troupe",
+    "name": "流浪大地的乐团",
+    "rarity": [4, 5],
+    "twoPieceBonus": "元素精通提高80点",
+    "fourPieceBonus": "装备该圣遗物套装的角色为法器、弓箭角色时，角色重击造成的伤害提高35%"
+  },
+  {
+    "id": "noblesse_oblige",
+    "name": "昔日宗室之仪",
+    "rarity": [4, 5],
+    "twoPieceBonus": "元素爆发造成的伤害提升20%",
+    "fourPieceBonus": "施放元素爆发后，队伍中所有角色攻击力提升20%，持续12秒。该效果不可叠加"
+  },
+  {
+    "id": "bloodstained_chivalry",
+    "name": "染血的骑士道",
+    "rarity": [4, 5],
+    "twoPieceBonus": "物理伤害加成提高25%",
+    "fourPieceBonus": "击败敌人后的10秒内，施放重击时不消耗体力，且重击造成的伤害提升50%"
+  },
+  {
+    "id": "viridescent_venerer",
+    "name": "翠绿之影",
+    "rarity": [4, 5],
+    "twoPieceBonus": "获得15%风元素伤害加成",
+    "fourPieceBonus": "扩散反应造成的伤害提升60%。根据扩散的元素类型，降低受到影响的敌人40%的对应元素抗性，持续10秒"
+  },
+  {
+    "id": "crimson_witch_of_flames",
+    "name": "炽烈的炎之魔女",
+    "rarity": [4, 5],
+    "twoPieceBonus": "获得15%火元素伤害加成",
+    "fourPieceBonus": "超载、燃烧、烈绽放反应造成的伤害提升40%，蒸发、融化反应的加成系数提高15%。施放元素战技后的10秒内，2件套的效果提高50%，该效果最多叠加3次"
+  },
+  {
+    "id": "thundering_fury",
+    "name": "如雷的盛怒",
+    "rarity": [4, 5],
+    "twoPieceBonus": "获得15%雷元素伤害加成",
+    "fourPieceBonus": "超载、感电、超导、超绽放反应造成的伤害提升40%，激化反应造成的伤害提升20%。触发上述元素反应时，元素战技冷却时间减少1秒。该效果每0.8秒最多触发一次"
+  },
+  {
+    "id": "blizzard_strayer",
+    "name": "冰风迷途的勇士",
+    "rarity": [4, 5],
+    "twoPieceBonus": "获得15%冰元素伤害加成",
+    "fourPieceBonus": "攻击处于冰元素影响下的敌人时，暴击率提高20%；若敌人处于冻结状态下，暴击率额外提高20%"
+  },
+  {
+    "id": "heart_of_depth",
+    "name": "沉沦之心",
+    "rarity": [4, 5],
+    "twoPieceBonus": "获得15%水元素伤害加成",
+    "fourPieceBonus": "施放元素战技后的15秒内，普通攻击与重击造成的伤害提高30%"
+  },
+  {
+    "id": "tenacity_of_the_millelith",
+    "name": "千岩牢固",
+    "rarity": [4, 5],
+    "twoPieceBonus": "生命值提升20%",
+    "fourPieceBonus": "元素战技命中敌人后，使队伍中附近的所有角色攻击力提升20%，护盾强效提升30%，持续3秒。该效果每0.5秒至多触发一次。装备此圣遗物套装的角色处于队伍后台时，依然能触发该效果"
+  },
+  {
+    "id": "pale_flame",
+    "name": "苍白之火",
+    "rarity": [4, 5],
+    "twoPieceBonus": "物理伤害加成提高25%",
+    "fourPieceBonus": "元素战技命中敌人后，攻击力提升9%。该效果持续7秒，最多叠加2层，每0.3秒至多触发一次。叠满2层时，2件套的效果提升100%"
+  },
+  {
+    "id": "shimenawas_reminiscence",
+    "name": "追忆之注连",
+    "rarity": [4, 5],
+    "twoPieceBonus": "攻击力提高18%",
+    "fourPieceBonus": "施放元素战技时，如果角色的元素能量高于或等于15点，则会流失15点元素能量，使接下来的10秒内，普通攻击、重击、下落攻击造成的伤害提高50%。持续期间内该效果不会再次触发"
+  },
+  {
+    "id": "emblem_of_severed_fate",
+    "name": "绝缘之旗印",
+    "rarity": [4, 5],
+    "twoPieceBonus": "元素充能效率提高20%",
+    "fourPieceBonus": "基于元素充能效率的25%，提高元素爆发造成的伤害。至多通过这种方式获得75%提升"
+  },
+  {
+    "id": "husk_of_opulent_dreams",
+    "name": "华馆梦醒形骸记",
+    "rarity": [4, 5],
+    "twoPieceBonus": "防御力提高30%",
+    "fourPieceBonus": "装备此圣遗物套装的角色在以下情况下，将获得「问答」效果：在场上用岩元素攻击命中敌人后获得一层，每0.3秒至多触发一次；在队伍后台中，每3秒获得一层。「问答」至多叠加4层，每层能提供6%防御力与6%岩元素伤害加成。每6秒，若未获得「问答」效果，将损失一层"
+  },
+  {
+    "id": "ocean_hued_clam",
+    "name": "海染砗磲",
+    "rarity": [4, 5],
+    "twoPieceBonus": "治疗加成提高15%",
+    "fourPieceBonus": "装备此圣遗物套装的角色对队伍中的角色进行治疗时，将产生持续3秒的海染泡沫，记录治疗的生命值回复量（包括溢出值）。持续时间结束时，海染泡沫将会爆炸，对周围的敌人造成90%累计回复量的伤害（该伤害结算方式同感电、超导等元素反应，但不受元素精通、等级或反应伤害加成效果影响）。每3.5秒至多产生一个海染泡沫；海染泡沫至多记录30000点回复量，含溢出值"
+  },
+  {
+    "id": "vermillion_hereafter",
+    "name": "辰砂往生录",
+    "rarity": [4, 5],
+    "twoPieceBonus": "攻击力提高18%",
+    "fourPieceBonus": "施放元素爆发后，该角色将获得持续16秒的「潜光」效果：攻击力提升8%；并在角色的生命值降低时，攻击力进一步提升10%，至多通过这种方式提升4次，每0.8秒至多触发一次。「潜光」效果将在角色退场时消失；持续期间再次施放元素爆发，将移除原有的「潜光」效果"
+  },
+  {
+    "id": "echoes_of_an_offering",
+    "name": "来歆余响",
+    "rarity": [4, 5],
+    "twoPieceBonus": "攻击力提高18%",
+    "fourPieceBonus": "普通攻击命中敌人时，有36%概率触发「幽谷祝祀」：普通攻击造成的伤害提高，伤害提高值为攻击力的70%，该效果将在普通攻击造成伤害后的0.05秒后清除。普通攻击未触发「幽谷祝祀」时，会使下次触发概率提高20%；0.2秒内至多判定一次触发与否"
+  },
+  {
+    "id": "deepwood_memories",
+    "name": "深林的记忆",
+    "rarity": [4, 5],
+    "twoPieceBonus": "获得15%草元素伤害加成",
+    "fourPieceBonus": "元素战技或元素爆发命中敌人后，使命中目标的草元素抗性降低30%，持续8秒。装备此圣遗物套装的角色处于队伍后台时，依然能触发该效果"
+  },
+  {
+    "id": "gilded_dreams",
+    "name": "饰金之梦",
+    "rarity": [4, 5],
+    "twoPieceBonus": "元素精通提高80点",
+    "fourPieceBonus": "触发元素反应后的8秒内，会根据队伍内其他角色的元素类型，使装备者获得强化：队伍中每存在1个和装备者同类元素的角色，攻击力提升14%；每存在1个和装备者不同元素类型的角色，元素精通提升50点。上述每类效果至多计算3个角色。该效果每8秒至多触发一次。装备者处于队伍后台时，依然能触发该效果"
+  },
+  {
+    "id": "desert_pavilion_chronicle",
+    "name": "沙上楼阁史话",
+    "rarity": [4, 5],
+    "twoPieceBonus": "获得15%风元素伤害加成",
+    "fourPieceBonus": "重击命中敌人后，该角色的普通攻击速度提升10%，普通攻击、重击与下落攻击造成的伤害提升40%，持续15秒"
+  },
+  {
+    "id": "flower_of_paradise_lost",
+    "name": "乐园遗落之花",
+    "rarity": [4, 5],
+    "twoPieceBonus": "元素精通提高80点",
+    "fourPieceBonus": "装备此圣遗物套装的角色绽放、超绽放、烈绽放反应造成的伤害提升40%。此外，装备者触发绽放、超绽放、烈绽放后的10秒内，上述效果带来的加成提升25%，该效果至多叠加4次，每1秒至多触发一次。装备者处于队伍后台时，依然能触发和获得该效果"
+  },
+  {
+    "id": "nymphs_dream",
+    "name": "水仙之梦",
+    "rarity": [4, 5],
+    "twoPieceBonus": "获得15%水元素伤害加成",
+    "fourPieceBonus": "普通攻击、重击、下落攻击、元素战技或元素爆发命中敌人后，将产生1层持续8秒的「镜中水仙」效果。处于1/2/3层及以上「镜中水仙」效果下时，攻击力将提高7%/16%/25%，水元素伤害加成提升4%/9%/15%。由普通攻击、重击、下落攻击、元素战技或元素爆发产生的「镜中水仙」将分别独立存在"
+  },
+  {
+    "id": "vourukashas_glow",
+    "name": "花海甘露之光",
+    "rarity": [4, 5],
+    "twoPieceBonus": "生命值提升20%",
+    "fourPieceBonus": "元素战技与元素爆发造成的伤害提升10%。装备此圣遗物套装的角色受到伤害后的5秒内，上述伤害加成提高80%，该提高效果至多叠加5层，每层持续时间独立计算；处于队伍后台时依然能触发该效果"
+  },
+  {
+    "id": "marechaussee_hunter",
+    "name": "逐影猎人",
+    "rarity": [4, 5],
+    "twoPieceBonus": "普通攻击与重击造成的伤害提高15%",
+    "fourPieceBonus": "当前生命值提升或降低时，暴击率提升12%，该效果持续5秒，至多叠加3次"
+  },
+  {
+    "id": "golden_troupe",
+    "name": "黄金剧团",
+    "rarity": [4, 5],
+    "twoPieceBonus": "元素战技造成的伤害提升20%",
+    "fourPieceBonus": "元素战技造成的伤害提升25%；此外，处于队伍后台时，元素战技造成的伤害还将进一步提升25%，该效果将在登场后2秒移除"
+  },
+  {
+    "id": "song_of_days_past",
+    "name": "昔时之歌",
+    "rarity": [4, 5],
+    "twoPieceBonus": "治疗加成提高15%",
+    "fourPieceBonus": "装备此圣遗物套装的角色对队伍中的角色进行治疗时，将记录治疗的生命值回复量，持续6秒，同时记录至多15000回复量，含溢出的治疗量。持续时间结束后，清除所记录的回复量，并为队伍中附近的所有角色恢复相当于8%所记录的回复量的元素能量，以及使队伍中附近的所有角色在10秒内普通攻击、重击与下落攻击造成的伤害提升，提升值相当于所记录回复量的8%。每15秒至多触发一次该效果；处于队伍后台时依然能触发"
+  },
+  {
+    "id": "nighttime_whispers_in_the_echoing_woods",
+    "name": "回声之林夜话",
+    "rarity": [4, 5],
+    "twoPieceBonus": "攻击力提高18%",
+    "fourPieceBonus": "触发结晶反应后，会获得「共鸣」效果：岩元素伤害加成提高35%，持续10秒。装备者处于队伍后台时，依然能触发该效果。「共鸣」效果最多叠加1层，且在切换队伍中装备此圣遗物套装的角色时会刷新持续时间"
+  },
+  {
+    "id": "fragment_of_harmonic_whimsy",
+    "name": "谐律异想断章",
+    "rarity": [4, 5],
+    "twoPieceBonus": "攻击力提高18%",
+    "fourPieceBonus": "当装备者的「元素类型对应的特定状态」发生变化时，获得「灵感」效果：攻击力提升18%，持续6秒，最多叠加3层，每层独立计时。其中「元素类型对应的特定状态」为：火/冰/雷元素：处于同类元素影响下；水/草元素：生命之契的数值变化；风/岩元素：护盾"
+  },
+  {
+    "id": "unfinished_reverie",
+    "name": "未竟的遐思",
+    "rarity": [4, 5],
+    "twoPieceBonus": "攻击力提高18%",
+    "fourPieceBonus": "脱离战斗状态3秒后，造成的伤害提升50%。战斗状态中，若当前没有处于燃烧元素反应影响下的敌人存在，则会在4秒后失去上述伤害加成，再次对敌人触发燃烧后恢复上述伤害加成"
+  },
+  {
+    "id": "scroll_of_the_hero_of_cinder_city",
+    "name": "烬城勇者绘卷",
+    "rarity": [4, 5],
+    "twoPieceBonus": "装备此圣遗物套装的角色对敌人施加火元素或燃素影响后，该敌人的火元素抗性降低40%，持续6秒",
+    "fourPieceBonus": "装备此圣遗物套装的角色触发燃烧反应或对处于燃烧状态下的敌人造成烈绽放伤害后，队伍中附近所有角色攻击力提升12%，持续6秒；处于夜魂加持状态下时，队伍中附近所有角色获得的攻击力提升额外提高28%"
+  },
+  {
+    "id": "obsidian_codex",
+    "name": "黑曜秘典",
+    "rarity": [4, 5],
+    "twoPieceBonus": "装备此圣遗物套装的角色处于夜魂加持状态下并在场上时，造成的伤害提升15%",
+    "fourPieceBonus": "装备此圣遗物套装的角色处于夜魂加持状态下并在场上时，受到的伤害降低40%，且暴击率提高，提高值相当于当前夜魂值的40%，至多提高40%"
+  },
+  {
+    "id": "archaic_petra",
+    "name": "悠古的磐岩",
+    "rarity": [4, 5],
+    "twoPieceBonus": "获得15%岩元素伤害加成",
+    "fourPieceBonus": "获得结晶反应形成的晶片时，队伍中所有角色获得35%对应元素伤害加成，持续10秒。同时只能通过该效果获得一种元素伤害加成"
+  },
+  {
+    "id": "retracing_bolide",
+    "name": "逆飞的流星",
+    "rarity": [4, 5],
+    "twoPieceBonus": "护盾强效提高35%",
+    "fourPieceBonus": "处于护盾庇护下时，额外获得40%普通攻击和重击伤害加成"
+  },
+  {
+    "id": "thundersoother",
+    "name": "平息鸣雷的尊者",
+    "rarity": [4, 5],
+    "twoPieceBonus": "雷元素抗性提高40%",
+    "fourPieceBonus": "对处于雷元素影响下的敌人造成的伤害提升35%"
+  },
+  {
+    "id": "lavawalker",
+    "name": "渡过烈火的贤人",
+    "rarity": [4, 5],
+    "twoPieceBonus": "火元素抗性提高40%",
+    "fourPieceBonus": "对处于火元素影响下的敌人造成的伤害提升35%"
+  },
+  {
+    "id": "maiden_beloved",
+    "name": "被怜爱的少女",
+    "rarity": [4, 5],
+    "twoPieceBonus": "角色造成的治疗效果提升15%",
+    "fourPieceBonus": "施放元素战技或元素爆发后的10秒内，队伍中所有角色受治疗效果提升20%"
+  },
+  {
+    "id": "berserker",
+    "name": "战狂",
+    "rarity": [3, 4],
+    "twoPieceBonus": "暴击率提高12%",
+    "fourPieceBonus": "生命值低于70%时，暴击率额外提升24%"
+  },
+  {
+    "id": "instructor",
+    "name": "教官",
+    "rarity": [3, 4],
+    "twoPieceBonus": "元素精通提高80点",
+    "fourPieceBonus": "触发元素反应后，队伍中所有角色元素精通提高120点，持续8秒"
+  },
+  {
+    "id": "the_exile",
+    "name": "流放者",
+    "rarity": [3, 4],
+    "twoPieceBonus": "元素充能效率提高20%",
+    "fourPieceBonus": "施放元素爆发后，每2秒为队伍中所有角色（不包括自己）恢复2点元素能量。该效果持续6秒，无法叠加"
+  },
+  {
+    "id": "resolution_of_sojourner",
+    "name": "行者之心",
+    "rarity": [3, 4],
+    "twoPieceBonus": "攻击力提高18%",
+    "fourPieceBonus": "重击的暴击率提升30%"
+  },
+  {
+    "id": "martial_artist",
+    "name": "武人",
+    "rarity": [3, 4],
+    "twoPieceBonus": "普通攻击与重击造成的伤害提高15%",
+    "fourPieceBonus": "施放元素战技后的8秒内，普通攻击和重击造成的伤害提升25%"
+  },
+  {
+    "id": "defenders_will",
+    "name": "守护之心",
+    "rarity": [3, 4],
+    "twoPieceBonus": "防御力提高30%",
+    "fourPieceBonus": "队伍里每有不同元素类型的自己的角色各一名，自身获得30%对应的元素抗性提升"
+  },
+  {
+    "id": "tiny_miracle",
+    "name": "奇迹",
+    "rarity": [3, 4],
+    "twoPieceBonus": "所有元素抗性提高20%",
+    "fourPieceBonus": "受到某个元素类型的伤害后，相应的抗性提升30%，持续10秒。该效果每10秒只能触发一次"
+  },
+  {
+    "id": "brave_heart",
+    "name": "勇士之心",
+    "rarity": [3, 4],
+    "twoPieceBonus": "攻击力提高18%",
+    "fourPieceBonus": "对生命值高于50%的敌人，造成的伤害增加30%"
+  },
+  {
+    "id": "gambler",
+    "name": "赌徒",
+    "rarity": [3, 4],
+    "twoPieceBonus": "元素战技造成的伤害提升20%",
+    "fourPieceBonus": "击败敌人时，有100%概率清除元素战技的冷却时间。该效果每15秒至多触发一次"
+  },
+  {
+    "id": "scholar",
+    "name": "学士",
+    "rarity": [3, 4],
+    "twoPieceBonus": "元素充能效率提高20%",
+    "fourPieceBonus": "获得元素微粒或元素晶球时，队伍中所有弓箭和法器角色额外恢复3点元素能量。该效果每3秒只能触发一次"
+  },
+  {
+    "id": "traveling_doctor",
+    "name": "游医",
+    "rarity": [1, 2, 3],
+    "twoPieceBonus": "角色受到的治疗效果提高20%",
+    "fourPieceBonus": "施放元素爆发时，恢复20%生命值"
+  },
+  {
+    "id": "lucky_dog",
+    "name": "幸运儿",
+    "rarity": [1, 2, 3],
+    "twoPieceBonus": "防御力提高100点",
+    "fourPieceBonus": "拾取摩拉时，恢复300点生命值"
+  },
+  {
+    "id": "adventurer",
+    "name": "冒险家",
+    "rarity": [1, 2, 3],
+    "twoPieceBonus": "生命值上限提高1000点",
+    "fourPieceBonus": "开启宝箱后的5秒内，持续恢复30%生命值"
+  }
+]
