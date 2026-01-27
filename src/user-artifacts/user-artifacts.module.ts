@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
 import { AccountsModule } from '../accounts/accounts.module';
+import { OcrModule } from '../ocr/ocr.module';
 import { UserArtifactsController } from './user-artifacts.controller';
 import { UserArtifactsService } from './user-artifacts.service';
 
 @Module({
-  imports: [AccountsModule],
+  imports: [AccountsModule, OcrModule],
   controllers: [UserArtifactsController],
   providers: [UserArtifactsService],
   exports: [UserArtifactsService],

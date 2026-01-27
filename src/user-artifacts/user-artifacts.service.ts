@@ -327,4 +327,8 @@ export class UserArtifactsService {
       ),
     };
   }
+
+  async validateAccountOwnership(userId: string, accountId: string): Promise<void> {
+    await this.ownership.validate(userId, accountId);
+  }
 }
