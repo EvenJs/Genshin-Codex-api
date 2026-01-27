@@ -15,6 +15,8 @@ model User {
   updatedAt     DateTime       @updatedAt
   gameAccounts  GameAccount[]
   refreshTokens RefreshToken[]
+  createdBuilds ArtifactBuild[] @relation("CreatedBuilds")
+  savedBuilds   SavedBuild[]    @relation("SavedBuilds")
 }
 
 model RefreshToken {
@@ -103,7 +105,9 @@ model ArtifactSet {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  artifacts UserArtifact[]
+  artifacts          UserArtifact[]
+  primarySetBuilds   ArtifactBuild[] @relation("PrimarySet")
+  secondarySetBuilds ArtifactBuild[] @relation("SecondarySet")
 
   @@index([name])
 }
@@ -165,6 +169,7 @@ model Character {
   updatedAt  DateTime   @updatedAt
 
   accountCharacters AccountCharacter[]
+  artifactBuilds    ArtifactBuild[]
 
   @@index([element])
   @@index([weaponType])
@@ -187,4 +192,59 @@ model AccountCharacter {
   @@unique([accountId, characterId])
   @@index([accountId])
   @@index([characterId])
+}
+
+// ==================== 推荐系统 ====================
+
+model ArtifactBuild {
+  id          String   @id @default(uuid())
+  name        String   // Build 名称，如 "绝缘永冻甘雨"
+  description String?  // Build 说明
+  characterId String   // 适用角色
+  creatorId   String   // 创建者
+  isPublic    Boolean  @default(false) // 是否公开分享
+
+  // 推荐套装配置
+  primarySetId   String  // 主要套装 (4件套)
+  secondarySetId String? // 次要套装 (2件套，用于2+2配置)
+  useFullSet     Boolean @default(true) // true: 4件套, false: 2+2件套
+
+  // 推荐主属性 (JSON 格式: {SANDS: "ATK%", GOBLET: "Pyro DMG%", CIRCLET: "Crit Rate%"})
+  recommendedMainStats Json
+
+  // 推荐副属性优先级 (数组格式: ["Crit Rate%", "Crit DMG%", "ATK%", "EM"])
+  subStatPriority Json
+
+  // 评分权重 (用于圣遗物评分算法)
+  statWeights Json? // {critRate: 2, critDmg: 1, atk: 0.5, ...}
+
+  notes     String? // 额外说明
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  character    Character     @relation(fields: [characterId], references: [id])
+  creator      User          @relation("CreatedBuilds", fields: [creatorId], references: [id], onDelete: Cascade)
+  primarySet   ArtifactSet   @relation("PrimarySet", fields: [primarySetId], references: [id])
+  secondarySet ArtifactSet?  @relation("SecondarySet", fields: [secondarySetId], references: [id])
+  savedBy      SavedBuild[]
+
+  @@index([characterId])
+  @@index([creatorId])
+  @@index([isPublic])
+  @@index([primarySetId])
+}
+
+model SavedBuild {
+  id        String   @id @default(uuid())
+  userId    String   // 保存此 Build 的用户
+  buildId   String   // 保存的 Build
+  notes     String?  // 用户的备注
+  createdAt DateTime @default(now())
+
+  user  User          @relation("SavedBuilds", fields: [userId], references: [id], onDelete: Cascade)
+  build ArtifactBuild @relation(fields: [buildId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, buildId]) // 同一用户不能重复保存同一 Build
+  @@index([userId])
+  @@index([buildId])
 }
