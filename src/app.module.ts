@@ -6,6 +6,7 @@ import { AccountsModule } from './accounts/accounts.module';
 import { AchievementsModule } from './achievements/achievements.module';
 import { ArtifactSetsModule } from './artifact-sets/artifact-sets.module';
 import { AuthModule } from './auth/auth.module';
+import { CharactersModule } from './characters/characters.module';
 import { HealthController } from './health/health.controller';
 import { PrismaModule } from './prisma/prisma.module';
 import { ProgressModule } from './progress/progress.module';
@@ -28,6 +29,7 @@ import { UserArtifactsModule } from './user-artifacts/user-artifacts.module';
     AccountsModule,
     AchievementsModule,
     ArtifactSetsModule,
+    CharactersModule,
     ProgressModule,
     UserArtifactsModule,
   ],
