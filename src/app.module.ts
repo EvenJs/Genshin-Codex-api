@@ -11,6 +11,7 @@ import { CharactersModule } from './characters/characters.module';
 import { HealthController } from './health/health.controller';
 import { PrismaModule } from './prisma/prisma.module';
 import { ProgressModule } from './progress/progress.module';
+import { RecommendationsModule } from './recommendations/recommendations.module';
 import { UserArtifactsModule } from './user-artifacts/user-artifacts.module';
 
 @Module({
@@ -33,6 +34,7 @@ import { UserArtifactsModule } from './user-artifacts/user-artifacts.module';
     BuildsModule,
     CharactersModule,
     ProgressModule,
+    RecommendationsModule,
     UserArtifactsModule,
   ],
   controllers: [HealthController],
