@@ -1,7 +1,9 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { ArtifactSlot } from '@prisma/client';
 import { AccountOwnershipService } from '../accounts/account-ownership.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { CreateAccountCharacterDto } from './dto/create-account-character.dto';
+import { UpdateAccountCharacterDto } from './dto/update-account-character.dto';
 import { EquipArtifactsDto } from './dto/equip-artifacts.dto';
 
 @Injectable()
@@ -215,5 +217,128 @@ export class AccountCharactersService {
     });
 
     return this.findById(userId, accountId, accountCharacterId);
+  }
+
+  async create(userId: string, accountId: string, dto: CreateAccountCharacterDto) {
+    await this.ownership.validate(userId, accountId);
+
+    // Verify the character exists
+    const character = await this.prisma.character.findUnique({
+      where: { id: dto.characterId },
+    });
+
+    if (!character) {
+      throw new NotFoundException(`Character ${dto.characterId} not found`);
+    }
+
+    // Check if this character already exists in the account
+    const existing = await this.prisma.accountCharacter.findFirst({
+      where: { accountId, characterId: dto.characterId },
+    });
+
+    if (existing) {
+      throw new ConflictException(
+        `Character ${character.name} already exists in this account`,
+      );
+    }
+
+    const created = await this.prisma.accountCharacter.create({
+      data: {
+        accountId,
+        characterId: dto.characterId,
+        level: dto.level,
+        constellation: dto.constellation ?? 0,
+      },
+      select: {
+        id: true,
+        level: true,
+        constellation: true,
+        createdAt: true,
+        character: {
+          select: {
+            id: true,
+            name: true,
+            element: true,
+            weaponType: true,
+            rarity: true,
+            region: true,
+            imageUrl: true,
+          },
+        },
+      },
+    });
+
+    return created;
+  }
+
+  async update(
+    userId: string,
+    accountId: string,
+    accountCharacterId: string,
+    dto: UpdateAccountCharacterDto,
+  ) {
+    await this.ownership.validate(userId, accountId);
+
+    // Verify the account character exists
+    const existing = await this.prisma.accountCharacter.findFirst({
+      where: { id: accountCharacterId, accountId },
+    });
+
+    if (!existing) {
+      throw new NotFoundException(`Character ${accountCharacterId} not found in this account`);
+    }
+
+    const updated = await this.prisma.accountCharacter.update({
+      where: { id: accountCharacterId },
+      data: {
+        ...(dto.level !== undefined && { level: dto.level }),
+        ...(dto.constellation !== undefined && { constellation: dto.constellation }),
+      },
+      select: {
+        id: true,
+        level: true,
+        constellation: true,
+        createdAt: true,
+        updatedAt: true,
+        character: {
+          select: {
+            id: true,
+            name: true,
+            element: true,
+            weaponType: true,
+            rarity: true,
+            region: true,
+            imageUrl: true,
+          },
+        },
+      },
+    });
+
+    return updated;
+  }
+
+  async remove(userId: string, accountId: string, accountCharacterId: string) {
+    await this.ownership.validate(userId, accountId);
+
+    // Verify the account character exists
+    const existing = await this.prisma.accountCharacter.findFirst({
+      where: { id: accountCharacterId, accountId },
+    });
+
+    if (!existing) {
+      throw new NotFoundException(`Character ${accountCharacterId} not found in this account`);
+    }
+
+    // Unequip all artifacts from this character before deleting
+    await this.prisma.userArtifact.updateMany({
+      where: { equippedById: accountCharacterId },
+      data: { equippedById: null },
+    });
+
+    await this.prisma.accountCharacter.delete({
+      where: { id: accountCharacterId },
+    });
+
+    return { success: true };
   }
 }
