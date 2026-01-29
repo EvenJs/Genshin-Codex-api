@@ -1,6 +1,16 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Element, WeaponType } from '@prisma/client';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+
+type CharacterSeed = {
+  id: string;
+  name: string;
+  element: Element;
+  weaponType: WeaponType;
+  rarity: number;
+  region?: string | null;
+  imageUrl?: string | null;
+};
 
 type AchievementSeed = {
   id: string;
@@ -104,9 +114,46 @@ async function seedArtifactSets() {
   console.log(`Seeded artifact sets: ${artifactSets.length}`);
 }
 
+async function seedCharacters() {
+  const dataPath = path.resolve(__dirname, 'seed-data', 'characters.json');
+  const characters = readJsonFile<CharacterSeed[]>(dataPath);
+
+  if (!Array.isArray(characters)) {
+    throw new Error('Characters seed data is not an array.');
+  }
+
+  await prisma.$transaction(
+    characters.map((c) =>
+      prisma.character.upsert({
+        where: { id: c.id },
+        update: {
+          name: c.name,
+          element: c.element,
+          weaponType: c.weaponType,
+          rarity: c.rarity,
+          region: c.region ?? null,
+          imageUrl: c.imageUrl ?? null
+        },
+        create: {
+          id: c.id,
+          name: c.name,
+          element: c.element,
+          weaponType: c.weaponType,
+          rarity: c.rarity,
+          region: c.region ?? null,
+          imageUrl: c.imageUrl ?? null
+        }
+      })
+    )
+  );
+
+  console.log(`Seeded characters: ${characters.length}`);
+}
+
 async function main() {
   await seedAchievements();
   await seedArtifactSets();
+  await seedCharacters();
 }
 
 main()
