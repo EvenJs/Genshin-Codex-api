@@ -158,15 +158,20 @@ enum WeaponType {
 }
 
 model Character {
-  id         String     @id
-  name       String
-  element    Element
-  weaponType WeaponType
-  rarity     Int // 4 或 5
-  region     String? // 蒙德、璃月、稻妻、须弥、枫丹、纳塔
-  imageUrl   String?
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
+  id               String     @id
+  name             String
+  element          Element
+  weaponType       WeaponType
+  rarity           Int // 4 或 5
+  region           String? // 蒙德、璃月、稻妻、须弥、枫丹、纳塔、挪德卡莱
+  affiliation      String? // 所属组织
+  visionAffiliation String? // 神之眼所属地区
+  role             String? // 定位（如：辅助、输出）
+  talents          Json? // 天赋详情
+  constellations   Json? // 命之座详情
+  imageUrl         String?
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
 
   accountCharacters AccountCharacter[]
   artifactBuilds    ArtifactBuild[]

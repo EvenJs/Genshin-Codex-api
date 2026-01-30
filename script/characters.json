@@ -1,0 +1,622 @@
+[
+  {
+    "character_id": 507505,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2026/01/07/50494840/b738d4adebf79c75155e489b0c1020dc_8181208928598091489.png",
+    "character_name": "哥伦比娅"
+  },
+  {
+    "character_id": 507503,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2025/12/17/50494840/286ef978a23fc3f678e861e2df53002a_301294995238877936.png",
+    "character_name": "兹白【预告】"
+  },
+  {
+    "character_id": 507504,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2025/12/17/50494840/ac787d470c3198667e5a70012b65f2a0_2670444485446776722.png",
+    "character_name": "叶洛亚【预告】"
+  },
+  {
+    "character_id": 505631,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2025/07/21/50494840/bd297354e4709df7963f6dc976ab8784_5144561901319432302.png",
+    "character_name": "伊涅芙"
+  },
+  {
+    "character_id": 504977,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2025/04/30/50494840/2e3d4c0271c4a08f524c767ba0166c18_3571952643229256603.png",
+    "character_name": "伊法"
+  },
+  {
+    "character_id": 382,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2021/08/23/75276545/18a67c8802d7184db1449693908fe6cf_7858478886557060389.png",
+    "character_name": "菲谢尔"
+  },
+  {
+    "character_id": 501212,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2024/06/25/195563531/94b2aad4aa86087da3427cfd13223406_1838144106966207925.png",
+    "character_name": "赛索斯"
+  },
+  {
+    "character_id": 507241,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2025/11/24/50494840/7adbbcee16df7088c22a9c0582f8a5e5_3264399417008532150.png",
+    "character_name": "杜林"
+  },
+  {
+    "character_id": 507287,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2025/11/28/50494840/2d8bafcf920d23e6b0307bfbb8287547_1851629366329380334.png",
+    "character_name": "雅珂达"
+  },
+  {
+    "character_id": 506676,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2025/10/16/50494840/eb6d91e9db4d4811a172c1477fdf4bb3_8055436051310247221.png",
+    "character_name": "奈芙尔"
+  },
+  {
+    "character_id": 506960,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2025/10/22/50494840/7617caf2440cadbe673617c4481a62c9_1933299159986831123.png",
+    "character_name": "奇偶·男性"
+  },
+  {
+    "character_id": 506961,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2025/10/22/50494840/df3bf2a57d76b889f22bc2172c0bd08b_3658525519828329949.png",
+    "character_name": "奇偶·女性"
+  },
+  {
+    "character_id": 500291,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2024/07/16/195563531/376ed8406d6315d5a77f4cdd5e917b9b_7215590901861641475.png",
+    "character_name": "芙宁娜"
+  },
+  {
+    "character_id": 505971,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2025/08/29/50494840/580bb3983dcd02b1deee98cbdab99f0b_8777161852000493899.png",
+    "character_name": "菲林斯"
+  },
+  {
+    "character_id": 505973,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2025/09/01/50494840/45dc7f4d9f71563546e664ed68e56d72_604412205691851460.png",
+    "character_name": "菈乌玛"
+  },
+  {
+    "character_id": 5111,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2022/10/24/4328207/f9f8f331dea3cc4920037df2018437d0_4958876478140111847.png",
+    "character_name": "纳西妲"
+  },
+  {
+    "character_id": 505972,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2025/09/02/50494840/b1ee842a84eca650e1bfe380113e02bd_7400282632413554498.png",
+    "character_name": "爱诺"
+  },
+  {
+    "character_id": 5020,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2024/08/06/6276411/aad25ff85d04d98abbac7b1cc405ea69_4186120229500438642.png",
+    "character_name": "妮露"
+  },
+  {
+    "character_id": 5865,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2024/06/25/195563531/c1c6746b3d53c687c3f570337dbecb32_1172740701584748808.png",
+    "character_name": "艾尔海森"
+  },
+  {
+    "character_id": 4780,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2022/09/20/4328207/b3847d2416145eb8bb6343302e2b4dca_6997837798254516316.png",
+    "character_name": "赛诺"
+  },
+  {
+    "character_id": 5494,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2024/06/05/195563531/fb1713aa667884c5552452170b5931fa_4501254112268017431.png",
+    "character_name": "流浪者"
+  },
+  {
+    "character_id": 4334,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2022/08/23/75379475/6953568084aaa02bc7a774430f1f3b56_9172357402103659910.png",
+    "character_name": "提纳里"
+  },
+  {
+    "character_id": 6180,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2023/03/21/195563531/3499be9a309249e2ddf1a0533af1f4c7_958475410876966785.png",
+    "character_name": "迪希雅"
+  },
+  {
+    "character_id": 502928,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2024/11/15/4328207/58706184319196823f524fb123660410_363771165283840438.png",
+    "character_name": "恰斯卡"
+  },
+  {
+    "character_id": 501625,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2024/08/23/4328207/b2a2cf3412e9399a0a519525b330689e_2457703043196193750.png",
+    "character_name": "玛拉妮"
+  },
+  {
+    "character_id": 105,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2021/08/23/75276545/498b43ef0d21c4e2c1d7a1dea0deea3f_2145838239611168396.png",
+    "character_name": "班尼特"
+  },
+  {
+    "character_id": 502927,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2024/11/15/6276411/83cabdbf42c9f395ecc6bbe370b6cc86_2387313554830714373.png",
+    "character_name": "欧洛伦"
+  },
+  {
+    "character_id": 503612,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2024/12/25/4328207/37aa13adb9419746ac29fe13893f2d91_3053993473631843068.png",
+    "character_name": "茜特菈莉"
+  },
+  {
+    "character_id": 241,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2021/08/23/75276545/cd48b60376438c60dbaaa8a85e6a480b_2048377578381627282.png",
+    "character_name": "行秋"
+  },
+  {
+    "character_id": 503613,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2024/12/25/4328207/dc36c2dc0fc1bcd418a17fe907e7bb33_5872605765675589334.png",
+    "character_name": "玛薇卡"
+  },
+  {
+    "character_id": 501441,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2024/08/28/195563531/3753712ae6c479c8f1ee841f60b1835f_7919993437788900063.png",
+    "character_name": "艾梅莉埃"
+  },
+  {
+    "character_id": 504621,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2025/03/20/50494840/19d45814816f79b54e2dd3fb5e212615_7586309228486916731.png",
+    "character_name": "伊安珊"
+  },
+  {
+    "character_id": 5866,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2023/01/17/4328207/6616c1963d8b8cd12303e683872778d6_5414525268363973241.png",
+    "character_name": "瑶瑶"
+  },
+  {
+    "character_id": 112,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2021/08/23/75276545/83a69074378a0837ca65d33e9052d729_6648871595979928785.png",
+    "character_name": "香菱"
+  },
+  {
+    "character_id": 505417,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2025/06/11/50494840/867b0b36bfd629cd5ce88443cc5816c6_4280221560184703515.png",
+    "character_name": "丝柯克"
+  },
+  {
+    "character_id": 3386,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2022/01/05/16314655/e2dfeee83654c0a6a7436b7c120c105a_6628180966971160404.png",
+    "character_name": "申鹤"
+  },
+  {
+    "character_id": 505418,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2025/06/11/50494840/9508cb49aeb8ab876dc013c5a7e08272_3046493633434450631.png",
+    "character_name": "塔利雅"
+  },
+  {
+    "character_id": 4781,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2022/09/20/4328207/0587df6ac5144c9dd023b0f73ceaf8be_7837788427682725710.png",
+    "character_name": "坎蒂丝"
+  },
+  {
+    "character_id": 1221,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2021/08/23/75276545/759f0ebba20d33f606c2ecc025b9b586_6011368354846344391.png",
+    "character_name": "迪奥娜"
+  },
+  {
+    "character_id": 501624,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2024/09/08/4328207/829ceb3bdc9e5c7f91d03c52c111a11c_4825365709203515402.png",
+    "character_name": "基尼奇"
+  },
+  {
+    "character_id": 2404,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2021/09/01/16314655/4f2125e44d2b9e15611877eda1794ec7_7083452076426995696.png",
+    "character_name": "雷电将军"
+  },
+  {
+    "character_id": 2123,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2021/07/21/75276545/eaef31b81b190dc676413b099c540526_6543346382757797116.png",
+    "character_name": "神里绫华"
+  },
+  {
+    "character_id": 3875,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2022/03/25/4328207/d16fbf95d62771daa65ab5d04f6abbd5_8453888407594383379.png",
+    "character_name": "神里绫人"
+  },
+  {
+    "character_id": 5493,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2022/12/06/4328207/38a192da1174b705cc6648e854162ab0_6403431489397028121.png",
+    "character_name": "珐露珊"
+  },
+  {
+    "character_id": 500987,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2024/03/08/4328207/b7981ed652471fb61c8c076ddeb80c35_6675240404947958375.png",
+    "character_name": "千织"
+  },
+  {
+    "character_id": 3564,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2022/02/15/6276411/2a54cd4008e8bc398f3f8bdc08225048_2883595654384922672.jpg",
+    "character_name": "八重神子"
+  },
+  {
+    "character_id": 3276,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2021/12/14/16314655/567d0cf114a7f799d650df6e4c7cc0e2_8422200515118882596.jpg",
+    "character_name": "荒泷一斗"
+  },
+  {
+    "character_id": 2124,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2021/08/10/75276545/43014af35ae9c4cdf19a8323aa04a0a9_2108182380466335233.png",
+    "character_name": "宵宫"
+  },
+  {
+    "character_id": 6938,
+    "character_avatar": "https://act-upload.mihoyo.com/ys-obc/2023/08/17/24077343/74feea88c304c86a33be3fd191d055dc_2469184593388252358.png",
+    "character_name": "琳妮特"
+  },
+  {
+    "character_id": 2402,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2021/09/01/16314655/5284b4f47bf6d9e9451d79ad5066d744_9148992125502860596.png",
+    "character_name": "九条裟罗"
+  },
+  {
+    "character_id": 504976,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2025/05/01/50494840/cc1d0ae2568f3791339a21ff22b43ed9_6702845488440320041.png",
+    "character_name": "爱可菲"
+  },
+  {
+    "character_id": 2606,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2021/11/02/16314655/f4b404cae89b96327a5b87500f7833c9_6577116317420146203.png",
+    "character_name": "托马"
+  },
+  {
+    "character_id": 500419,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2024/08/06/6276411/088e445c37004d5bae3f392460ec9133_5211661620543947822.png",
+    "character_name": "娜维娅"
+  },
+  {
+    "character_id": 5297,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2022/10/24/4328207/f7f5c758e157cc6d6ca7b7a378d665e6_8346107013175588314.png",
+    "character_name": "莱依拉"
+  },
+  {
+    "character_id": 502306,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2024/10/04/4328207/ff1745c76b33c041c26e64e137dae368_8553993354333645956.png",
+    "character_name": "希诺宁"
+  },
+  {
+    "character_id": 57,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2021/08/23/75276545/3008da32b80ba05f243bc2c858b534b5_540461000064419548.png",
+    "character_name": "温迪"
+  },
+  {
+    "character_id": 1795,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2021/08/23/75276545/b8952d8a5d2d266126ce370c4eb78438_4209492093986588378.png",
+    "character_name": "烟绯"
+  },
+  {
+    "character_id": 500673,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2024/01/25/4328207/ead14be79052a8d19bbbb2a69c2f0c23_2532694057563153983.png",
+    "character_name": "闲云"
+  },
+  {
+    "character_id": 79,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2021/08/23/75276545/0f7406a1ea1b7fb827d7abe14bfe83e8_3108123811393147392.png",
+    "character_name": "北斗"
+  },
+  {
+    "character_id": 504570,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2025/03/20/50494840/b929945af5d8b2fdeabfa1fb96e5b082_700551622398662804.png",
+    "character_name": "瓦雷莎"
+  },
+  {
+    "character_id": 500605,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2024/01/04/4328207/e77bf4b2d49e3cc50545b83dc071d3a6_7850725164094643458.png",
+    "character_name": "夏沃蕾"
+  },
+  {
+    "character_id": 500672,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2024/01/27/4328207/2b04443b4a98a07ab7e933399fbd2e6e_8078545953039492000.png",
+    "character_name": "嘉明"
+  },
+  {
+    "character_id": 501214,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2024/07/16/195563531/b517758b373bfdc2afa3a93e0f68381f_4356070929918876023.png",
+    "character_name": "希格雯"
+  },
+  {
+    "character_id": 500286,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2023/10/17/4328207/e1f49352e0f53081cf6d7758cc9a8eef_77085490975887896.png",
+    "character_name": "莱欧斯利"
+  },
+  {
+    "character_id": 503614,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2024/12/25/4328207/3f06ace813ea5d401cce5088257212ee_1796029922647873700.png",
+    "character_name": "蓝砚"
+  },
+  {
+    "character_id": 504440,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2025/02/10/50494840/d6aa6797e523529d661616e268e74380_389705375310379015.png",
+    "character_name": "梦见月瑞希"
+  },
+  {
+    "character_id": 501157,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2024/04/24/4328207/233036f362e6ac0dfdd297eafa96469a_1487053469241930464.png",
+    "character_name": "阿蕾奇诺"
+  },
+  {
+    "character_id": 501213,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2024/06/25/195563531/8640359c4557760b17135f70f348bece_9108632157062235155.png",
+    "character_name": "克洛琳德"
+  },
+  {
+    "character_id": 6489,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2024/06/05/195563531/582333e1eede03ef5083c8fdf83f836f_5616908562056844182.png",
+    "character_name": "白术"
+  },
+  {
+    "character_id": 1058,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2021/08/23/75276545/666155bbd60391341253e4b1daace9d4_2687379046030308520.png",
+    "character_name": "刻晴"
+  },
+  {
+    "character_id": 1433,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2021/08/23/75276545/8b9946e573bf7aff9801c580707a23e1_3026364173026253689.png",
+    "character_name": "甘雨"
+  },
+  {
+    "character_id": 1056,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2021/08/23/75276545/a08d22cf34d2836519a80a8537fe12c8_7861266877849414180.png",
+    "character_name": "七七"
+  },
+  {
+    "character_id": 1498,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2021/08/23/75276545/a02533e3ac055344982bcfd04865ae72_6103227973780149519.png",
+    "character_name": "魈"
+  },
+  {
+    "character_id": 1220,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2021/08/23/75276545/c0a4fcefc01b018856439e023dd4dc7a_6675006735371357498.png",
+    "character_name": "达达利亚"
+  },
+  {
+    "character_id": 1290,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2021/08/23/75276545/6682780141a9e7788da99c71b1cfd5c3_6751062493374563471.png",
+    "character_name": "钟离"
+  },
+  {
+    "character_id": 500207,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2023/09/22/4328207/df52fcefd995f94e041d9baec6ae891d_7203866992337938184.png",
+    "character_name": "那维莱特"
+  },
+  {
+    "character_id": 1627,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2021/08/23/75276545/8980427ee3cecce2a46400d2c0af6d20_4290442929626456243.png",
+    "character_name": "胡桃"
+  },
+  {
+    "character_id": 501626,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2024/08/23/4328207/915caed11374ed6c80912d334d3acee3_3325609054012637151.png",
+    "character_name": "卡齐娜"
+  },
+  {
+    "character_id": 2142,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2021/08/23/75276545/2566b97ea262980d9bcd7db6a116bfd4_6795571745044574054.png",
+    "character_name": "枫原万叶"
+  },
+  {
+    "character_id": 59,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2022/02/16/6276411/a7608c6a588467440f7685a22ab6547c_3946325001679449884.png",
+    "character_name": "琴"
+  },
+  {
+    "character_id": 75,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2021/08/23/75276545/8ae58465155b31a21319522383027436_4999468226785017726.png",
+    "character_name": "迪卢克"
+  },
+  {
+    "character_id": 1057,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2022/02/16/6276411/d7d8e4a15f70e31a16edaa6d7389437f_2242463119371173498.png",
+    "character_name": "莫娜"
+  },
+  {
+    "character_id": 4081,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2024/08/28/195563531/79396e8f1225b66e201036e086dd2d8a_1123934130505570131.png",
+    "character_name": "夜兰"
+  },
+  {
+    "character_id": 6937,
+    "character_avatar": "https://act-upload.mihoyo.com/ys-obc/2023/08/17/24077343/04309f44cfd43ecaad1c6b17504e842b_4501929243289411018.png",
+    "character_name": "林尼"
+  },
+  {
+    "character_id": 2040,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2021/08/23/75276545/525f808e85fb7a13c37debaf3c7d1463_4010662131576296773.png",
+    "character_name": "优菈"
+  },
+  {
+    "character_id": 1360,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2021/08/23/75276545/01009cc20f9a4ebf4ece5e96fdecad1a_3067405046796818316.png",
+    "character_name": "阿贝多"
+  },
+  {
+    "character_id": 2403,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2021/09/21/75379475/5f6f5d0c81155aea5c939ba08249e5d5_6649173224604660824.png",
+    "character_name": "珊瑚宫心海"
+  },
+  {
+    "character_id": 55,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2021/06/21/283462834/d2972c634d9d81979774b22b49d1ab01_887661176891008491.png",
+    "character_name": "可莉"
+  },
+  {
+    "character_id": 111,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2021/08/23/75276545/5cd5b91e504b2466197796cb26fcb7be_508847912159113655.png",
+    "character_name": "诺艾尔"
+  },
+  {
+    "character_id": 500292,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2023/11/04/4328207/36006d0ad619b747c9df0f40dfd01c10_7459161693395273701.png",
+    "character_name": "夏洛蒂"
+  },
+  {
+    "character_id": 7257,
+    "character_avatar": "https://act-upload.mihoyo.com/ys-obc/2023/08/25/183046623/89f7db6b71496415c3ddab8d5d2c049c_963653190890281567.png",
+    "character_name": "菲米尼"
+  },
+  {
+    "character_id": 1744,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2022/02/16/6276411/bdec34acae15315368017c1dbc29e106_1767613545250694082.png",
+    "character_name": "罗莎莉亚"
+  },
+  {
+    "character_id": 6594,
+    "character_avatar": "https://act-upload.mihoyo.com/ys-obc/2023/05/22/4328207/3d3c77af378ae13a284da6ee46e7c8a5_6115762659247939353.png",
+    "character_name": "绮良良"
+  },
+  {
+    "character_id": 6490,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2023/04/11/4328207/27f90730a0c5c4d6ff4d29ebfb1c5d60_7616208328714055928.png",
+    "character_name": "卡维"
+  },
+  {
+    "character_id": 6285,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2023/03/18/4328207/37fed1b2ed047eeea78833328ffb27e4_8054575673536318186.png",
+    "character_name": "米卡"
+  },
+  {
+    "character_id": 4736,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2022/09/07/195563531/844969ce9b8bc5ebf9d1be69d7b6d7b2_4659886404719657655.png",
+    "character_name": "多莉"
+  },
+  {
+    "character_id": 4333,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2022/08/23/75379475/a0150a8489abc5011a44b4f6419ccec7_2812696932246907984.png",
+    "character_name": "柯莱"
+  },
+  {
+    "character_id": 4197,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2022/07/09/4328207/cc145e6cd2f0dacb39ce36f7ebf257fc_7138351098291917226.png",
+    "character_name": "鹿野院平藏"
+  },
+  {
+    "character_id": 3387,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2022/01/05/16314655/6f4bbe7d060f72a0c84e868887ac7a32_4711867403945994990.png",
+    "character_name": "云堇"
+  },
+  {
+    "character_id": 78,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2021/08/23/75276545/e4e41cdfac3bdc225f0b847f2cc2cd72_5640782607282153058.png",
+    "character_name": "凝光"
+  },
+  {
+    "character_id": 4148,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2022/05/10/4328207/33c41932d1b5531ac73bca243c761816_9206912725698153960.png",
+    "character_name": "久岐忍"
+  },
+  {
+    "character_id": 2125,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2021/08/10/75276545/4f50355892c08017346ea3ab80071b9c_1725343112540399387.png",
+    "character_name": "早柚"
+  },
+  {
+    "character_id": 3275,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2021/12/14/16314655/1535aaa6189d4262445c0a66ead22eb9_8396030312270652951.png",
+    "character_name": "五郎"
+  },
+  {
+    "character_id": 644,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2021/08/23/75276545/0bd80f58871b97281be47fcd6e2d7487_1302151446666002486.png",
+    "character_name": "重云"
+  },
+  {
+    "character_id": 92,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2021/08/23/75276545/014d59ec5b78c3499b90f45fc80c00a4_5392359609224242061.png",
+    "character_name": "丽莎"
+  },
+  {
+    "character_id": 1291,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2021/08/23/75276545/a4b09e58a0d52ea0808b4cef5725ac93_6743022430414510479.png",
+    "character_name": "辛焱"
+  },
+  {
+    "character_id": 56,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2021/08/23/75276545/24edfa5586de73329a2b2c5c5d4262a3_3505783202009716970.png",
+    "character_name": "雷泽"
+  },
+  {
+    "character_id": 76,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2021/08/23/75276545/60d8b985eef1e6e0e959410893a75dc0_6659933186171988912.png",
+    "character_name": "凯亚"
+  },
+  {
+    "character_id": 61,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2021/08/23/75276545/7f1ac500bafa0526438e4e5b95165991_9116453886373904076.png",
+    "character_name": "芭芭拉"
+  },
+  {
+    "character_id": 1055,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2021/08/23/75276545/b30efaf1e19725ddda490a2028b17464_6998283335917930867.png",
+    "character_name": "砂糖"
+  },
+  {
+    "character_id": 54,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2022/02/16/6276411/138132721f21bf60c53a8935a8fb0107_8908120754759624960.png",
+    "character_name": "安柏"
+  },
+  {
+    "character_id": 2415,
+    "character_avatar": "https://uploadstatic.mihoyo.com/ys-obc/2021/11/05/10875381/65886603cf7f0bdbaa82a165898237a3_1473519897376013260.png",
+    "character_name": "埃洛伊"
+  },
+  {
+    "character_id": 4073,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2025/06/19/50494840/842d8b35c086bd5b118b4a087dfa659a_592193460858220737.png",
+    "character_name": "旅行者·火 "
+  },
+  {
+    "character_id": 4074,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2025/06/19/50494840/ddb09b2b9fc9de8525f8b07846fe0a07_1516962597729482736.png",
+    "character_name": "旅行者·火"
+  },
+  {
+    "character_id": 505505,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2025/06/19/50494840/ae7beee14b29dda6083cb4b6de2cd4f2_5960862678314744892.png",
+    "character_name": "旅行者·水"
+  },
+  {
+    "character_id": 505500,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2025/06/19/50494840/fb0ff93e12bbf519122d7230ecaef4a4_6317122032538342806.png",
+    "character_name": "旅行者·水"
+  },
+  {
+    "character_id": 505498,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2025/06/19/50494840/6fbf6c64a18d376844cafed891c192fd_7355596816362506738.png",
+    "character_name": "旅行者·草"
+  },
+  {
+    "character_id": 505502,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2025/06/19/50494840/31f6f8fae63eadcbf9b14a7f079bc858_5146747288004623002.png",
+    "character_name": "旅行者·草"
+  },
+  {
+    "character_id": 505496,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2025/06/19/50494840/e3a6798ca31f81e5774c119947176e8c_4165436452872675084.png",
+    "character_name": "旅行者·雷"
+  },
+  {
+    "character_id": 505503,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2025/06/19/50494840/2c4ea40c43a88336089a4b547214021f_7494957552727963882.png",
+    "character_name": "旅行者·雷"
+  },
+  {
+    "character_id": 505497,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2025/06/19/50494840/29bcea85b135eafaa261382d7a02455b_1937805459604933643.png",
+    "character_name": "旅行者·岩"
+  },
+  {
+    "character_id": 505501,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2025/06/19/50494840/5d7ed79592402eef03dc5e23098c8180_3429002417896306848.png",
+    "character_name": "旅行者·岩"
+  },
+  {
+    "character_id": 505504,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2025/06/19/50494840/f394baeb5099e1ac12db23e16445c82e_6757723224935154347.png",
+    "character_name": "旅行者·风"
+  },
+  {
+    "character_id": 505499,
+    "character_avatar": "https://act-upload.mihoyo.com/wiki-user-upload/2025/06/19/50494840/85a0e35d3f9dcd86004e69ac5c27d94a_8212727181575963340.png",
+    "character_name": "旅行者·风"
+  }
+]
