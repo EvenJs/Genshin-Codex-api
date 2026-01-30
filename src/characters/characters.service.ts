@@ -15,6 +15,11 @@ export class CharactersService {
         weaponType: true,
         rarity: true,
         region: true,
+        affiliation: true,
+        visionAffiliation: true,
+        role: true,
+        talents: true,
+        constellations: true,
         imageUrl: true,
       },
     });
@@ -30,6 +35,11 @@ export class CharactersService {
         weaponType: true,
         rarity: true,
         region: true,
+        affiliation: true,
+        visionAffiliation: true,
+        role: true,
+        talents: true,
+        constellations: true,
         imageUrl: true,
       },
     });

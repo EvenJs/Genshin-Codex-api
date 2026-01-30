@@ -123,7 +123,7 @@ async function seedCharacters() {
   }
 
   const validCharacters = characters.filter(
-    (c) => c.id && c.name && c.element && c.weaponType,
+    (c) => c.id && c.name && c.element,
   );
 
   await prisma.$transaction(
