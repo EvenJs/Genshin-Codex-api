@@ -122,8 +122,12 @@ async function seedCharacters() {
     throw new Error('Characters seed data is not an array.');
   }
 
+  const validCharacters = characters.filter(
+    (c) => c.id && c.name && c.element && c.weaponType,
+  );
+
   await prisma.$transaction(
-    characters.map((c) =>
+    validCharacters.map((c) =>
       prisma.character.upsert({
         where: { id: c.id },
         update: {
@@ -147,7 +151,12 @@ async function seedCharacters() {
     )
   );
 
-  console.log(`Seeded characters: ${characters.length}`);
+  if (validCharacters.length !== characters.length) {
+    console.warn(
+      `Skipped characters with missing fields: ${characters.length - validCharacters.length}`,
+    );
+  }
+  console.log(`Seeded characters: ${validCharacters.length}`);
 }
 
 async function main() {

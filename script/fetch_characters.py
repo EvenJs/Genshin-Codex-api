@@ -2,6 +2,7 @@
 import json
 import sys
 import time
+import html
 from pathlib import Path
 from urllib.request import Request, urlopen
 from urllib.error import URLError, HTTPError
@@ -37,6 +38,66 @@ def _find_items(obj):
     return None
 
 
+def _collect_filter_texts(obj, out):
+    if isinstance(obj, dict):
+        filt = obj.get("filter")
+        if isinstance(filt, dict) and "text" in filt:
+            out.append(filt.get("text"))
+        for v in obj.values():
+            _collect_filter_texts(v, out)
+    elif isinstance(obj, list):
+        for v in obj:
+            _collect_filter_texts(v, out)
+
+
+def _collect_strings(obj, out):
+    if isinstance(obj, dict):
+        for v in obj.values():
+            _collect_strings(v, out)
+    elif isinstance(obj, list):
+        for v in obj:
+            _collect_strings(v, out)
+    elif isinstance(obj, str):
+        out.append(obj)
+
+
+def _extract_rarity(item):
+    texts = []
+    _collect_filter_texts(item, texts)
+    # Also scan any string fields for embedded filter JSON
+    _collect_strings(item, texts)
+
+    for t in texts:
+        arr = None
+        if isinstance(t, list):
+            arr = t
+        elif isinstance(t, str):
+            s = html.unescape(t)
+            if "星级/四星" in s:
+                return 4
+            if "星级/五星" in s:
+                return 5
+            try:
+                arr = json.loads(s)
+            except json.JSONDecodeError:
+                try:
+                    arr = json.loads(s.replace('\\"', '"').replace("\\\\", "\\"))
+                except json.JSONDecodeError:
+                    arr = None
+        if not arr:
+            continue
+        for entry in arr:
+            if not isinstance(entry, str):
+                continue
+            if entry.startswith("星级/"):
+                value = entry.split("/", 1)[1]
+                if value == "五星":
+                    return 5
+                if value == "四星":
+                    return 4
+    return None
+
+
 def main():
     req = Request(URL, headers={"User-Agent": USER_AGENT})
     try:
@@ -67,6 +128,7 @@ def main():
                 "character_id": item.get("content_id"),
                 "character_avatar": item.get("icon"),
                 "character_name": item.get("title"),
+                "rarity": _extract_rarity(item),
             }
         )
 

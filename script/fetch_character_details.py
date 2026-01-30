@@ -16,7 +16,27 @@ BASE_URL = (
 
 SCRIPT_DIR = Path(__file__).parent
 IN_FILE = SCRIPT_DIR / "characters.json"
-OUT_FILE = SCRIPT_DIR / "characterDetails.json"
+OUT_FILE = SCRIPT_DIR.parent / "prisma" / "seed-data" / "characters.json"
+BASE_SEED_FILE = SCRIPT_DIR.parent / "prisma" / "seed-data" / "characters.base.json"
+
+ELEMENT_MAP = {
+    "火": "PYRO",
+    "水": "HYDRO",
+    "风": "ANEMO",
+    "雷": "ELECTRO",
+    "草": "DENDRO",
+    "冰": "CRYO",
+    "岩": "GEO",
+}
+
+WEAPON_MAP = {
+    "单手剑": "SWORD",
+    "双手剑": "CLAYMORE",
+    "长柄武器": "POLEARM",
+    "弓": "BOW",
+    "弓箭": "BOW",
+    "法器": "CATALYST",
+}
 
 USER_AGENT = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -420,12 +440,39 @@ def fetch_detail_with_retry(character_id, retries=3, backoff=0.8):
 
 
 def main():
+    rarity_by_name = {}
+    id_by_name = {}
+    if BASE_SEED_FILE.exists():
+        try:
+            base_data = json.loads(BASE_SEED_FILE.read_text(encoding="utf-8"))
+            if isinstance(base_data, list):
+                for item in base_data:
+                    name = item.get("name")
+                    rarity = item.get("rarity")
+                    if isinstance(name, str) and isinstance(rarity, int):
+                        rarity_by_name[name] = rarity
+                    if isinstance(name, str) and item.get("id"):
+                        id_by_name[name] = item.get("id")
+        except json.JSONDecodeError:
+            pass
+
     try:
         with open(IN_FILE, "r", encoding="utf-8") as f:
             characters = json.load(f)
     except FileNotFoundError:
         print(f"Missing {IN_FILE}", file=sys.stderr)
         return 1
+
+    avatar_by_id = {}
+    rarity_by_id = {}
+    name_by_id = {}
+    for item in characters:
+        cid = item.get("character_id")
+        if cid is None:
+            continue
+        avatar_by_id[str(cid)] = item.get("character_avatar")
+        rarity_by_id[str(cid)] = item.get("rarity")
+        name_by_id[str(cid)] = item.get("character_name")
 
     results = []
     failed_ids = []
@@ -436,10 +483,32 @@ def main():
         try:
             data = fetch_detail_with_retry(character_id)
             fields = _extract_fields(data)
-            fields["character_id"] = character_id
-            results.append(fields)
+            name = fields.get("name") or name_by_id.get(str(character_id))
+            if not name:
+                raise ValueError(f"Missing name for {character_id}")
+
+            element = ELEMENT_MAP.get(fields.get("元素"))
+            weapon = WEAPON_MAP.get(fields.get("武器类型"))
+            rarity = rarity_by_id.get(str(character_id)) or rarity_by_name.get(name)
+
+            seed_item = {
+                "id": id_by_name.get(name) or str(character_id),
+                "name": name,
+                "element": element,
+                "weaponType": weapon,
+                "rarity": int(rarity) if rarity is not None else None,
+                "region": fields.get("地区"),
+                "affiliation": fields.get("所属"),
+                "visionAffiliation": fields.get("神之眼所属"),
+                "role": fields.get("定位"),
+                "talents": fields.get("天赋"),
+                "constellations": fields.get("命之座"),
+                "imageUrl": avatar_by_id.get(str(character_id)),
+            }
+
+            results.append(seed_item)
             print(f"[{idx}/{len(characters)}] OK {character_id}")
-        except (HTTPError, URLError) as e:
+        except (HTTPError, URLError, ValueError) as e:
             print(f"[{idx}/{len(characters)}] FAIL {character_id}: {e}", file=sys.stderr)
             failed_ids.append(character_id)
         except json.JSONDecodeError as e:

@@ -161,8 +161,8 @@ model Character {
   id               String     @id
   name             String
   element          Element
-  weaponType       WeaponType
-  rarity           Int // 4 或 5
+  weaponType       WeaponType?
+  rarity           Int? // 4 或 5
   region           String? // 蒙德、璃月、稻妻、须弥、枫丹、纳塔、挪德卡莱
   affiliation      String? // 所属组织
   visionAffiliation String? // 神之眼所属地区
