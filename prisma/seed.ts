@@ -1,4 +1,4 @@
-import { PrismaClient, Element, WeaponType } from '@prisma/client';
+import { PrismaClient, Element, WeaponType, Prisma } from '@prisma/client';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 
@@ -6,9 +6,14 @@ type CharacterSeed = {
   id: string;
   name: string;
   element: Element;
-  weaponType: WeaponType;
-  rarity: number;
+  weaponType?: WeaponType | null;
+  rarity?: number | null;
   region?: string | null;
+  affiliation?: string | null;
+  visionAffiliation?: string | null;
+  role?: string | null;
+  talents?: Record<string, string> | null;
+  constellations?: Record<string, string> | null;
   imageUrl?: string | null;
 };
 
@@ -136,6 +141,11 @@ async function seedCharacters() {
           weaponType: c.weaponType,
           rarity: c.rarity,
           region: c.region ?? null,
+          affiliation: c.affiliation ?? null,
+          visionAffiliation: c.visionAffiliation ?? null,
+          role: c.role ?? null,
+          talents: c.talents ?? Prisma.JsonNull,
+          constellations: c.constellations ?? Prisma.JsonNull,
           imageUrl: c.imageUrl ?? null
         },
         create: {
@@ -145,6 +155,11 @@ async function seedCharacters() {
           weaponType: c.weaponType,
           rarity: c.rarity,
           region: c.region ?? null,
+          affiliation: c.affiliation ?? null,
+          visionAffiliation: c.visionAffiliation ?? null,
+          role: c.role ?? null,
+          talents: c.talents ?? Prisma.JsonNull,
+          constellations: c.constellations ?? Prisma.JsonNull,
           imageUrl: c.imageUrl ?? null
         }
       })
