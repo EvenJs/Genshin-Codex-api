@@ -50,23 +50,38 @@ model GameAccount {
   @@index([userId])
 }
 
+model AchievementCategory {
+  id         String  @id @default(uuid())
+  name       String  @unique
+  title      String
+  link       String?
+  icon       String?
+  background String?
+
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  achievements Achievement[]
+
+  @@index([name])
+}
+
 model Achievement {
   id              String   @id
   name            String
   description     String
-  category        String
-  region          String
+  categoryId      String
   version         String?
   isHidden        Boolean  @default(false)
   rewardPrimogems Int      @default(0)
   guide           String?
+  source          String?
 
   createdAt DateTime              @default(now())
   updatedAt DateTime              @updatedAt
+  category  AchievementCategory   @relation(fields: [categoryId], references: [id])
   progress  AchievementProgress[]
 
-  @@index([category])
-  @@index([region])
+  @@index([categoryId])
 }
 
 model AchievementProgress {

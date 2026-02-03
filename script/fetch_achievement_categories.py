@@ -1,20 +1,47 @@
 # -*- coding: utf-8 -*-
 import json
 import re
+import time
 import html as html_lib
 from urllib.parse import urljoin
-from urllib.request import urlopen, Request
+from urllib.request import Request, build_opener, HTTPCookieProcessor
+from urllib.error import HTTPError
 
 URL = "https://wiki.biligame.com/ys/%E6%88%90%E5%B0%B1%E7%B3%BB%E7%BB%9F"
 BASE = "https://wiki.biligame.com"
-OUT_PATH = "Genshin-Codex-api/script/achievementCategories.json"
+OUT_PATH = "Genshin-Codex-api/prisma/seed-data/achievementCategories.json"
 
-def fetch_html(url: str) -> str:
-    req = Request(url, headers={
-        "User-Agent": "Mozilla/5.0"
-    })
-    with urlopen(req) as resp:
-        return resp.read().decode("utf-8", "ignore")
+OPENER = build_opener(HTTPCookieProcessor())
+JINA_PREFIX = "https://r.jina.ai/http://"
+
+def fetch_html(url: str, retries: int = 4, delay: float = 1.0) -> str:
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+        "Referer": "https://wiki.biligame.com/ys/",
+        "Connection": "keep-alive",
+    }
+    last_err = None
+    for attempt in range(retries):
+        try:
+            req = Request(url, headers=headers)
+            with OPENER.open(req, timeout=20) as resp:
+                return resp.read().decode("utf-8", "ignore")
+        except HTTPError as err:
+            last_err = err
+            if err.code == 567:
+                try:
+                    proxy_url = JINA_PREFIX + url.replace("https://", "").replace("http://", "")
+                    with OPENER.open(proxy_url, timeout=20) as resp:
+                        return resp.read().decode("utf-8", "ignore")
+                except Exception as proxy_err:
+                    last_err = proxy_err
+            time.sleep(delay * (2 ** attempt))
+        except Exception as err:
+            last_err = err
+            time.sleep(delay * (2 ** attempt))
+    raise last_err
 
 def _pick_img_src(tag: str) -> str:
     if not tag:

@@ -17,16 +17,24 @@ type CharacterSeed = {
   imageUrl?: string | null;
 };
 
+type AchievementCategorySeed = {
+  name: string;
+  title: string;
+  link?: string | null;
+  icon?: string | null;
+  background?: string | null;
+};
+
 type AchievementSeed = {
   id: string;
   name: string;
   description: string;
   category: string;
-  region: string;
   version?: string | null;
   isHidden?: boolean;
   rewardPrimogems?: number;
   guide?: string | null;
+  source?: string | null;
 };
 
 type ArtifactSetSeed = {
@@ -45,6 +53,36 @@ function readJsonFile<T>(filePath: string): T {
   return JSON.parse(raw) as T;
 }
 
+async function seedAchievementCategories() {
+  const dataPath = path.resolve(__dirname, 'seed-data', 'achievementCategories.json');
+  const categories = readJsonFile<AchievementCategorySeed[]>(dataPath);
+
+  if (!Array.isArray(categories)) {
+    throw new Error('Achievement categories seed data is not an array.');
+  }
+
+  for (const c of categories) {
+    await prisma.achievementCategory.upsert({
+      where: { name: c.name },
+      update: {
+        title: c.title,
+        link: c.link ?? null,
+        icon: c.icon ?? null,
+        background: c.background ?? null
+      },
+      create: {
+        name: c.name,
+        title: c.title,
+        link: c.link ?? null,
+        icon: c.icon ?? null,
+        background: c.background ?? null
+      }
+    });
+  }
+
+  console.log(`Seeded achievement categories: ${categories.length}`);
+}
+
 async function seedAchievements() {
   const dataPath = path.resolve(__dirname, 'seed-data', 'achievements.json');
   const achievements = readJsonFile<AchievementSeed[]>(dataPath);
@@ -53,34 +91,42 @@ async function seedAchievements() {
     throw new Error('Achievements seed data is not an array.');
   }
 
-  await prisma.$transaction(
-    achievements.map((a) =>
-      prisma.achievement.upsert({
-        where: { id: a.id },
-        update: {
-          name: a.name,
-          description: a.description,
-          category: a.category,
-          region: a.region,
-          version: a.version ?? null,
-          isHidden: a.isHidden ?? false,
-          rewardPrimogems: a.rewardPrimogems ?? 0,
-          guide: a.guide ?? null
-        },
-        create: {
-          id: a.id,
-          name: a.name,
-          description: a.description,
-          category: a.category,
-          region: a.region,
-          version: a.version ?? null,
-          isHidden: a.isHidden ?? false,
-          rewardPrimogems: a.rewardPrimogems ?? 0,
-          guide: a.guide ?? null
-        }
-      })
-    )
-  );
+  // Get all categories for mapping
+  const categories = await prisma.achievementCategory.findMany();
+  const categoryMap = new Map(categories.map((c) => [c.name, c.id]));
+
+  for (const a of achievements) {
+    const categoryId = categoryMap.get(a.category);
+    if (!categoryId) {
+      console.warn(`Category not found for achievement ${a.id}: ${a.category}`);
+      continue;
+    }
+
+    await prisma.achievement.upsert({
+      where: { id: a.id },
+      update: {
+        name: a.name,
+        description: a.description,
+        categoryId,
+        version: a.version ?? null,
+        isHidden: a.isHidden ?? false,
+        rewardPrimogems: a.rewardPrimogems ?? 0,
+        guide: a.guide ?? null,
+        source: a.source ?? null
+      },
+      create: {
+        id: a.id,
+        name: a.name,
+        description: a.description,
+        categoryId,
+        version: a.version ?? null,
+        isHidden: a.isHidden ?? false,
+        rewardPrimogems: a.rewardPrimogems ?? 0,
+        guide: a.guide ?? null,
+        source: a.source ?? null
+      }
+    });
+  }
 
   console.log(`Seeded achievements: ${achievements.length}`);
 }
@@ -175,6 +221,7 @@ async function seedCharacters() {
 }
 
 async function main() {
+  await seedAchievementCategories();
   await seedAchievements();
   await seedArtifactSets();
   await seedCharacters();
