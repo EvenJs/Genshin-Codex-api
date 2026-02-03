@@ -51,6 +51,11 @@ export class ListAccountAchievementsQueryDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
+  categoryId?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
   region?: string;
 
   @ApiPropertyOptional()

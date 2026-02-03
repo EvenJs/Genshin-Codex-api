@@ -1,5 +1,5 @@
 import { Transform } from 'class-transformer';
-import { IsBoolean, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import { IsBoolean, IsInt, IsOptional, Max, Min } from 'class-validator';
 
 function toInt(value: unknown, fallback: number): number {
   const n = typeof value === 'string' ? Number.parseInt(value, 10) : Number(value);
@@ -15,7 +15,7 @@ function toBool(value: unknown): boolean | undefined {
   return undefined;
 }
 
-export class ListAchievementsQueryDto {
+export class ListCategoriesQueryDto {
   @IsOptional()
   @Transform(({ value }) => toInt(value, 1))
   @IsInt()
@@ -23,34 +23,14 @@ export class ListAchievementsQueryDto {
   page: number = 1;
 
   @IsOptional()
-  @Transform(({ value }) => toInt(value, 20))
+  @Transform(({ value }) => toInt(value, 50))
   @IsInt()
   @Min(1)
   @Max(100)
-  pageSize: number = 20;
-
-  @IsOptional()
-  @IsString()
-  category?: string;
-
-  @IsOptional()
-  @IsString()
-  categoryId?: string;
-
-  @IsOptional()
-  @IsString()
-  region?: string;
+  pageSize: number = 50;
 
   @IsOptional()
   @Transform(({ value }) => toBool(value))
   @IsBoolean()
-  isHidden?: boolean;
-
-  @IsOptional()
-  @IsString()
-  version?: string;
-
-  @IsOptional()
-  @IsString()
-  q?: string;
+  includeCount?: boolean = true;
 }

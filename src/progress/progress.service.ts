@@ -79,7 +79,7 @@ export class ProgressService {
   ) {
     await this.ownership.validate(userId, accountId);
 
-    const { page, pageSize, status, category, region, isHidden, version, q } = query;
+    const { page, pageSize, status, category, categoryId, region, isHidden, version, q } = query;
 
     // Get all completed achievement IDs for this account
     const completedRecords = await this.prisma.achievementProgress.findMany({
@@ -91,6 +91,7 @@ export class ProgressService {
     // Build base where clause for achievements
     const baseWhere: Prisma.AchievementWhereInput = {
       ...(category ? { category } : {}),
+      ...(categoryId ? { categoryId } : {}),
       ...(region ? { region } : {}),
       ...(version ? { version } : {}),
       ...(typeof isHidden === 'boolean' ? { isHidden } : {}),
@@ -122,7 +123,8 @@ export class ProgressService {
         where,
         skip,
         take: pageSize,
-        orderBy: [{ category: 'asc' }, { name: 'asc' }],
+        orderBy: [{ categoryId: 'asc' }, { name: 'asc' }],
+        include: { category: { select: { name: true, title: true } } },
       }),
       this.prisma.achievement.count({ where }),
     ]);

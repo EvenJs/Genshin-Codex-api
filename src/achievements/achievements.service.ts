@@ -15,10 +15,11 @@ export class AchievementsService {
   constructor(private readonly prisma: PrismaService) {}
 
   async list(query: ListAchievementsQueryDto): Promise<PaginatedResult<any>> {
-    const { page, pageSize, category, region, isHidden, version, q } = query;
+    const { page, pageSize, category, categoryId, region, isHidden, version, q } = query;
 
     const where: Prisma.AchievementWhereInput = {
-      ...(category ? { category } : {}),
+      ...(category ? { category: { name: category } } : {}),
+      ...(categoryId ? { categoryId } : {}),
       ...(region ? { region } : {}),
       ...(version ? { version } : {}),
       ...(typeof isHidden === 'boolean' ? { isHidden } : {}),
@@ -41,7 +42,8 @@ export class AchievementsService {
         where,
         skip,
         take,
-        orderBy: [{ category: 'asc' }, { name: 'asc' }],
+        orderBy: [{ categoryId: 'asc' }, { name: 'asc' }],
+        include: { category: { select: { name: true, title: true } } },
       }),
     ]);
 

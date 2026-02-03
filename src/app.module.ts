@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { CacheModule } from '@nestjs/cache-manager';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { AccountsModule } from './accounts/accounts.module';
+import { AchievementCategoriesModule } from './achievement-categories/achievement-categories.module';
 import { AchievementsModule } from './achievements/achievements.module';
 import { ArtifactSetsModule } from './artifact-sets/artifact-sets.module';
 import { AuthModule } from './auth/auth.module';
@@ -37,6 +38,7 @@ import { UserArtifactsModule } from './user-artifacts/user-artifacts.module';
     PrismaModule,
     AuthModule,
     AccountsModule,
+    AchievementCategoriesModule,
     AchievementsModule,
     ArtifactSetsModule,
     BuildsModule,
