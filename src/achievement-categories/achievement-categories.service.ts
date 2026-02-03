@@ -22,7 +22,7 @@ export class AchievementCategoriesService {
       this.prisma.achievementCategory.findMany({
         skip,
         take: pageSize,
-        orderBy: { name: 'asc' },
+        orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
         ...(includeCount && {
           include: {
             _count: {

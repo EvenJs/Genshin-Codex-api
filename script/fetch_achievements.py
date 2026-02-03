@@ -175,8 +175,9 @@ def main():
         name = cat.get("name") or cat.get("title")
         if not name:
             continue
-        url = build_url(name)
-        print(f"[{idx + 1}/{total}] Fetching: {name}")
+        page_title = cat.get("title") or name
+        url = build_url(page_title)
+        print(f"[{idx + 1}/{total}] Fetching: {page_title}")
         try:
             html_text = fetch_html(url)
             items = parse_achievements(html_text)

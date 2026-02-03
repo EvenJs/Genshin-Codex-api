@@ -20,6 +20,7 @@ type CharacterSeed = {
 type AchievementCategorySeed = {
   name: string;
   title: string;
+  sortOrder?: number;
   link?: string | null;
   icon?: string | null;
   background?: string | null;
@@ -61,11 +62,13 @@ async function seedAchievementCategories() {
     throw new Error('Achievement categories seed data is not an array.');
   }
 
-  for (const c of categories) {
+  for (const [index, c] of categories.entries()) {
+    const sortOrder = c.sortOrder ?? index;
     await prisma.achievementCategory.upsert({
       where: { name: c.name },
       update: {
         title: c.title,
+        sortOrder,
         link: c.link ?? null,
         icon: c.icon ?? null,
         background: c.background ?? null
@@ -73,6 +76,7 @@ async function seedAchievementCategories() {
       create: {
         name: c.name,
         title: c.title,
+        sortOrder,
         link: c.link ?? null,
         icon: c.icon ?? null,
         background: c.background ?? null
