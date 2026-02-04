@@ -6,6 +6,7 @@ import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { AccountsModule } from './accounts/accounts.module';
 import { AchievementCategoriesModule } from './achievement-categories/achievement-categories.module';
 import { AchievementsModule } from './achievements/achievements.module';
+import { AiModule } from './ai/ai.module';
 import { ArtifactSetsModule } from './artifact-sets/artifact-sets.module';
 import { AuthModule } from './auth/auth.module';
 import { BuildsModule } from './builds/builds.module';
@@ -36,6 +37,7 @@ import { UserArtifactsModule } from './user-artifacts/user-artifacts.module';
       ],
     }),
     PrismaModule,
+    AiModule,
     AuthModule,
     AccountsModule,
     AchievementCategoriesModule,
