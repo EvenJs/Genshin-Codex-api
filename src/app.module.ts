@@ -7,6 +7,7 @@ import { AccountsModule } from './accounts/accounts.module';
 import { AchievementCategoriesModule } from './achievement-categories/achievement-categories.module';
 import { AchievementsModule } from './achievements/achievements.module';
 import { AiModule } from './ai/ai.module';
+import { ArtifactAnalysisModule } from './artifact-analysis/artifact-analysis.module';
 import { ArtifactSetsModule } from './artifact-sets/artifact-sets.module';
 import { AuthModule } from './auth/auth.module';
 import { BuildsModule } from './builds/builds.module';
@@ -38,6 +39,7 @@ import { UserArtifactsModule } from './user-artifacts/user-artifacts.module';
     }),
     PrismaModule,
     AiModule,
+    ArtifactAnalysisModule,
     AuthModule,
     AccountsModule,
     AchievementCategoriesModule,
