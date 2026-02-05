@@ -39,6 +39,7 @@ export class ArtifactAnalysisController {
   @ApiParam({ name: 'artifactId', description: 'Artifact ID to analyze' })
   @ApiQuery({ name: 'characterId', required: false, description: 'Target character for context-aware analysis' })
   @ApiQuery({ name: 'skipCache', required: false, type: Boolean, description: 'Skip cache and force fresh analysis' })
+  @ApiQuery({ name: 'language', required: false, description: 'Preferred response language (zh or en)' })
   @ApiResponse({ status: 200, description: 'Artifact analysis result', type: ArtifactAnalysisResult })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Account belongs to another user' })
@@ -50,6 +51,7 @@ export class ArtifactAnalysisController {
     @Param('artifactId') artifactId: string,
     @Query('characterId') characterId?: string,
     @Query('skipCache') skipCache?: boolean,
+    @Query('language') language?: string,
   ): Promise<ArtifactAnalysisResult> {
     return this.analysisService.analyzeArtifact(
       user.userId,
@@ -57,6 +59,7 @@ export class ArtifactAnalysisController {
       artifactId,
       characterId,
       skipCache === true,
+      language,
     );
   }
 
@@ -72,8 +75,14 @@ export class ArtifactAnalysisController {
     @CurrentUser() user: JwtPayload,
     @Param('accountId') accountId: string,
     @Param('artifactId') artifactId: string,
+    @Query('language') language?: string,
   ): Promise<PotentialEvaluationResult> {
-    return this.analysisService.evaluatePotential(user.userId, accountId, artifactId);
+    return this.analysisService.evaluatePotential(
+      user.userId,
+      accountId,
+      artifactId,
+      language,
+    );
   }
 
   @ApiOperation({ summary: 'Batch analyze multiple artifacts' })
@@ -94,6 +103,7 @@ export class ArtifactAnalysisController {
       accountId,
       dto.artifactIds,
       dto.characterId,
+      dto.language,
     );
   }
 }

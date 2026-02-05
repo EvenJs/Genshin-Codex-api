@@ -15,6 +15,11 @@ export class AnalyzeArtifactDto {
   @IsOptional()
   @IsBoolean()
   skipCache?: boolean;
+
+  @ApiPropertyOptional({ description: 'Preferred response language (zh or en)', default: 'zh' })
+  @IsOptional()
+  @IsString()
+  language?: string;
 }
 
 /**
@@ -30,6 +35,11 @@ export class BatchAnalyzeDto {
   @IsOptional()
   @IsString()
   characterId?: string;
+
+  @ApiPropertyOptional({ description: 'Preferred response language (zh or en)', default: 'zh' })
+  @IsOptional()
+  @IsString()
+  language?: string;
 }
 
 /**
@@ -84,6 +94,8 @@ export class PotentialResult {
  * Single artifact analysis result
  */
 export class ArtifactAnalysisResult {
+  @ApiPropertyOptional({ description: 'AI result ID for feedback' })
+  aiResultId?: string;
   @ApiProperty({ description: 'Artifact ID' })
   artifactId: string;
 
@@ -153,6 +165,8 @@ export class SetAnalysisResult {
  * Batch analysis result
  */
 export class BatchAnalysisResult {
+  @ApiPropertyOptional({ description: 'AI result ID for feedback' })
+  aiResultId?: string;
   @ApiProperty({ type: [BatchArtifactSummary] })
   artifacts: BatchArtifactSummary[];
 
@@ -215,6 +229,8 @@ export class UpgradeRecommendation {
  * Potential evaluation result
  */
 export class PotentialEvaluationResult {
+  @ApiPropertyOptional({ description: 'AI result ID for feedback' })
+  aiResultId?: string;
   @ApiProperty()
   artifactId: string;
 

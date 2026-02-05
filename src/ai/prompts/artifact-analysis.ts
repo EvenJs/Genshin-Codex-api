@@ -33,7 +33,8 @@ You understand:
 - Sub-stat importance hierarchy: For most DPS characters: Crit Rate% ≈ Crit DMG% > ATK% > EM/ER% > flat stats
 - Set bonuses and their synergies with different character archetypes
 
-Always respond in valid JSON format with the exact structure requested.`;
+Always respond in valid JSON format with the exact structure requested.
+Return only JSON with double quotes. Do not add markdown, code fences, or commentary.`;
 
 /**
  * Build the analysis prompt for a single artifact
@@ -41,6 +42,7 @@ Always respond in valid JSON format with the exact structure requested.`;
 export function buildArtifactAnalysisPrompt(
   artifact: ArtifactForAnalysis,
   targetCharacter?: CharacterContext,
+  language?: string,
 ): string {
   const subStatsText = artifact.subStats
     .map((s) => `  - ${s.stat}: ${s.value}`)
@@ -50,6 +52,8 @@ export function buildArtifactAnalysisPrompt(
     ? `\nTarget Character: ${targetCharacter.name} (${targetCharacter.element} ${targetCharacter.weaponType}${targetCharacter.role ? `, ${targetCharacter.role}` : ''})`
     : '';
 
+  const languageInstruction = buildLanguageInstruction(language);
+
   return `Analyze this ${artifact.rarity}-star ${artifact.setName} artifact:
 
 Slot: ${artifact.slot}
@@ -58,6 +62,7 @@ Main Stat: ${artifact.mainStat} (${artifact.mainStatValue})
 Sub-Stats:
 ${subStatsText}
 ${characterContext}
+${languageInstruction}
 
 Provide analysis in this exact JSON format:
 {
@@ -91,6 +96,7 @@ Provide analysis in this exact JSON format:
 export function buildBatchAnalysisPrompt(
   artifacts: ArtifactForAnalysis[],
   characterContext?: CharacterContext,
+  language?: string,
 ): string {
   const artifactSummaries = artifacts.map((a, i) => {
     const subStats = a.subStats.map((s) => `${s.stat}:${s.value}`).join(', ');
@@ -101,9 +107,12 @@ export function buildBatchAnalysisPrompt(
     ? `For: ${characterContext.name} (${characterContext.element} ${characterContext.weaponType})`
     : 'General evaluation';
 
+  const languageInstruction = buildLanguageInstruction(language);
+
   return `Analyze these ${artifacts.length} artifacts. ${charContext}
 
 ${artifactSummaries.join('\n')}
+${languageInstruction}
 
 Provide analysis in this JSON format:
 {
@@ -129,7 +138,10 @@ Provide analysis in this JSON format:
 /**
  * Build prompt for potential/upgrade evaluation
  */
-export function buildPotentialEvaluationPrompt(artifact: ArtifactForAnalysis): string {
+export function buildPotentialEvaluationPrompt(
+  artifact: ArtifactForAnalysis,
+  language?: string,
+): string {
   const subStatsText = artifact.subStats
     .map((s) => `  - ${s.stat}: ${s.value}`)
     .join('\n');
@@ -145,6 +157,8 @@ Current Level: +${artifact.level} (${remainingUpgrades} upgrades remaining)
 Main Stat: ${artifact.mainStat}
 Current Sub-Stats:
 ${subStatsText}
+
+${buildLanguageInstruction(language)}
 
 Analyze in this JSON format:
 {
@@ -188,10 +202,13 @@ export function buildCharacterFitPrompt(
   artifact: ArtifactForAnalysis,
   character: CharacterContext,
   buildType?: string,
+  language?: string,
 ): string {
   const subStatsText = artifact.subStats
     .map((s) => `  - ${s.stat}: ${s.value}`)
     .join('\n');
+
+  const languageInstruction = buildLanguageInstruction(language);
 
   return `Evaluate how well this artifact fits ${character.name}:
 
@@ -208,6 +225,8 @@ Main Stat: ${artifact.mainStat} (${artifact.mainStatValue})
 Level: +${artifact.level}
 Sub-Stats:
 ${subStatsText}
+
+${languageInstruction}
 
 Analyze in this JSON format:
 {
@@ -232,4 +251,14 @@ Analyze in this JSON format:
     "alternatives": ["<better artifact options if applicable>"]
   }
 }`;
+}
+
+function buildLanguageInstruction(language?: string): string {
+  const lang = normalizeLanguage(language);
+  return `\nResponse language: ${lang === 'en' ? 'English' : 'Simplified Chinese'}. Use that language for all text fields.`;
+}
+
+function normalizeLanguage(language?: string): 'en' | 'zh' {
+  if (language?.toLowerCase().startsWith('en')) return 'en';
+  return 'zh';
 }

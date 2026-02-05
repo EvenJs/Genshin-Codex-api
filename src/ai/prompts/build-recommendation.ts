@@ -82,12 +82,16 @@ When making recommendations:
 4. Suggest upgrade priorities if artifacts aren't fully leveled
 5. Identify stat gaps and how to address them
 
-Always respond in valid JSON format with the exact structure requested.`;
+Always respond in valid JSON format with the exact structure requested.
+Return only JSON with double quotes. Do not add markdown, code fences, or commentary.`;
 
 /**
  * Build the recommendation prompt for a character
  */
-export function buildCharacterRecommendationPrompt(context: BuildRecommendationContext): string {
+export function buildCharacterRecommendationPrompt(
+  context: BuildRecommendationContext,
+  language?: string,
+): string {
   const { character, inventory, existingBuilds, preferences } = context;
 
   // Summarize available artifacts by slot
@@ -106,6 +110,8 @@ export function buildCharacterRecommendationPrompt(context: BuildRecommendationC
     ? `\nExisting Popular Builds:\n${existingBuilds.map((b, i) => `${i + 1}. ${b.name}: ${b.useFullSet ? '4pc' : '2+2'} ${b.primarySetName}${b.secondarySetName ? ` + ${b.secondarySetName}` : ''}`).join('\n')}`
     : '';
 
+  const languageInstruction = buildLanguageInstruction(language);
+
   return `Recommend artifact builds for ${character.name}:
 
 Character Info:
@@ -116,6 +122,7 @@ Character Info:
 ${character.role ? `- Role: ${character.role}` : ''}
 ${prefContext}
 ${existingContext}
+${languageInstruction}
 
 Available Artifact Sets (with 2+ pieces):
 ${setAvailability}
@@ -183,6 +190,7 @@ export function buildMultiBuildComparisonPrompt(
     artifacts: ArtifactForBuild[];
     setBonus: string;
   }[],
+  language?: string,
 ): string {
   const buildSummaries = builds.map((build, i) => {
     const stats = summarizeBuildStats(build.artifacts);
@@ -193,9 +201,12 @@ ${build.artifacts.map((a) => `    - ${a.slot}: ${a.setName} +${a.level} | ${a.ma
   ${stats}`;
   });
 
+  const languageInstruction = buildLanguageInstruction(language);
+
   return `Compare these builds for ${character.name} (${character.element} ${character.weaponType}):
 
 ${buildSummaries.join('\n\n')}
+${languageInstruction}
 
 Analyze and compare in this JSON format:
 {
@@ -240,6 +251,7 @@ export function buildReasoningPrompt(
   character: CharacterForBuild,
   selectedArtifacts: ArtifactForBuild[],
   setConfiguration: { primarySet: string; secondarySet?: string; useFullSet: boolean },
+  language?: string,
 ): string {
   const artifactDetails = selectedArtifacts
     .map(
@@ -247,6 +259,8 @@ export function buildReasoningPrompt(
         `${a.slot}: ${a.setName} +${a.level}\n    Main: ${a.mainStat} (${a.mainStatValue})\n    Subs: ${a.subStats.map((s) => `${s.stat}: ${s.value}`).join(', ')}`,
     )
     .join('\n  ');
+
+  const languageInstruction = buildLanguageInstruction(language);
 
   return `Explain why this artifact build is recommended for ${character.name}:
 
@@ -256,6 +270,8 @@ Set Configuration: ${setConfiguration.useFullSet ? '4pc' : '2+2'} ${setConfigura
 
 Selected Artifacts:
   ${artifactDetails}
+
+${languageInstruction}
 
 Provide detailed reasoning in this JSON format:
 {
@@ -303,6 +319,16 @@ Provide detailed reasoning in this JSON format:
 }
 
 // Helper functions
+
+function buildLanguageInstruction(language?: string): string {
+  const lang = normalizeLanguage(language);
+  return `\nResponse language: ${lang === 'en' ? 'English' : 'Simplified Chinese'}. Use that language for all text fields.`;
+}
+
+function normalizeLanguage(language?: string): 'en' | 'zh' {
+  if (language?.toLowerCase().startsWith('en')) return 'en';
+  return 'zh';
+}
 
 function summarizeArtifactsBySlot(artifacts: ArtifactForBuild[]): string {
   const slots: ArtifactSlot[] = ['FLOWER', 'PLUME', 'SANDS', 'GOBLET', 'CIRCLET'];

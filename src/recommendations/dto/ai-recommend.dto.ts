@@ -61,6 +61,14 @@ export class AiRecommendDto {
   @IsOptional()
   @IsBoolean()
   skipCache?: boolean;
+
+  @ApiPropertyOptional({
+    description: 'Preferred response language (zh or en)',
+    default: 'zh',
+  })
+  @IsOptional()
+  @IsString()
+  language?: string;
 }
 
 export class BuildConfigDto {
@@ -95,6 +103,14 @@ export class CompareBuildsDto {
   @ArrayMinSize(2)
   @ArrayMaxSize(5)
   buildConfigs: BuildConfigDto[];
+
+  @ApiPropertyOptional({
+    description: 'Preferred response language (zh or en)',
+    default: 'zh',
+  })
+  @IsOptional()
+  @IsString()
+  language?: string;
 }
 
 export class GenerateReasoningDto {
@@ -107,6 +123,14 @@ export class GenerateReasoningDto {
   @ArrayMinSize(1)
   @ArrayMaxSize(5)
   artifactIds: string[];
+
+  @ApiPropertyOptional({
+    description: 'Preferred response language (zh or en)',
+    default: 'zh',
+  })
+  @IsOptional()
+  @IsString()
+  language?: string;
 }
 
 export class ApplyBuildDto {

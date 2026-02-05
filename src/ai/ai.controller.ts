@@ -12,13 +12,18 @@ import { CurrentUser } from '../auth/current-user.decorator';
 import { JwtPayload } from '../auth/jwt.strategy';
 import { StrategyAssistantService } from './strategy-assistant/strategy-assistant.service';
 import { AiChatDto } from './strategy-assistant/dto/ai-chat.dto';
+import { AiFeedbackService } from './ai-feedback.service';
+import { AiFeedbackDto } from './dto/ai-feedback.dto';
 
 @ApiTags('AI Chat')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 @Controller('ai')
 export class AiController {
-  constructor(private readonly strategyAssistant: StrategyAssistantService) {}
+  constructor(
+    private readonly strategyAssistant: StrategyAssistantService,
+    private readonly aiFeedbackService: AiFeedbackService,
+  ) {}
 
   @ApiOperation({
     summary: 'Chat with the AI strategy assistant',
@@ -36,6 +41,7 @@ export class AiController {
         aiGenerated: { type: 'boolean' },
         knowledgeUsed: { type: 'boolean' },
         generatedAt: { type: 'string', format: 'date-time' },
+        aiResultId: { type: 'string' },
       },
     },
   })
@@ -57,6 +63,7 @@ export class AiController {
           user.userId,
           dto.message,
           dto.conversationId,
+          dto.language,
         )) {
           res.write(`data: ${JSON.stringify(event)}\n\n`);
           if (event.type === 'done' || event.type === 'error') {
@@ -76,8 +83,36 @@ export class AiController {
       user.userId,
       dto.message,
       dto.conversationId,
+      dto.language,
     );
 
     return res.json(response);
+  }
+
+  @ApiOperation({
+    summary: 'Submit feedback for an AI result',
+    description: 'Attach a rating and optional comments to a specific AI output.',
+  })
+  @ApiBody({ type: AiFeedbackDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Feedback saved',
+    schema: {
+      type: 'object',
+      properties: {
+        id: { type: 'string' },
+        aiResultId: { type: 'string' },
+        rating: { type: 'number' },
+        helpful: { type: 'boolean' },
+        comment: { type: 'string' },
+      },
+    },
+  })
+  @Post('feedback')
+  async submitFeedback(
+    @CurrentUser() user: JwtPayload,
+    @Body() dto: AiFeedbackDto,
+  ) {
+    return this.aiFeedbackService.submitFeedback(user.userId, dto);
   }
 }

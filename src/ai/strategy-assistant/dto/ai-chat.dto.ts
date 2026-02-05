@@ -16,4 +16,9 @@ export class AiChatDto {
   @IsOptional()
   @IsBoolean()
   stream?: boolean;
+
+  @ApiPropertyOptional({ description: 'Preferred response language (zh or en)', default: 'zh' })
+  @IsOptional()
+  @IsString()
+  language?: string;
 }

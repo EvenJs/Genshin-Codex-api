@@ -186,6 +186,7 @@ export class AiBuildRecommendationController {
       accountId,
       characterId,
       dto.artifactIds,
+      dto.language,
     );
   }
 

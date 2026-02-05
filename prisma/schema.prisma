@@ -8,15 +8,18 @@ datasource db {
 }
 
 model User {
-  id            String         @id @default(uuid())
-  email         String         @unique
+  id            String          @id @default(uuid())
+  email         String          @unique
   passwordHash  String
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
   gameAccounts  GameAccount[]
   refreshTokens RefreshToken[]
   createdBuilds ArtifactBuild[] @relation("CreatedBuilds")
   savedBuilds   SavedBuild[]    @relation("SavedBuilds")
+  aiResults     AiResult[]
+  aiFeedback    AiFeedback[]
+  aiUsage       AiUsage[]
 }
 
 model RefreshToken {
@@ -45,6 +48,7 @@ model GameAccount {
   progress   AchievementProgress[]
   artifacts  UserArtifact[]
   characters AccountCharacter[]
+  aiResults  AiResult[]
 
   @@unique([userId, uid, server])
   @@index([userId])
@@ -68,13 +72,13 @@ model AchievementCategory {
 }
 
 model Achievement {
-  id              String   @id
+  id              String  @id
   name            String
   description     String
   categoryId      String
   version         String?
-  isHidden        Boolean  @default(false)
-  rewardPrimogems Int      @default(0)
+  isHidden        Boolean @default(false)
+  rewardPrimogems Int     @default(0)
   guide           String?
   source          String?
 
@@ -130,23 +134,23 @@ model ArtifactSet {
 }
 
 model UserArtifact {
-  id           String       @id @default(uuid())
-  accountId    String
-  setId        String
-  slot         ArtifactSlot
-  mainStat     String // 主属性类型 (HP, ATK, DEF, HP%, ATK%, DEF%, EM, ER%, Crit Rate%, Crit DMG%, Healing%, Elemental DMG%)
-  mainStatValue Float       // 主属性数值
-  subStats     Json         // 副属性数组 [{stat: string, value: number}]
-  level        Int          @default(0) // 0-20
-  rarity       Int          // 1-5星
-  locked       Boolean      @default(false)
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
+  id            String       @id @default(uuid())
+  accountId     String
+  setId         String
+  slot          ArtifactSlot
+  mainStat      String // 主属性类型 (HP, ATK, DEF, HP%, ATK%, DEF%, EM, ER%, Crit Rate%, Crit DMG%, Healing%, Elemental DMG%)
+  mainStatValue Float // 主属性数值
+  subStats      Json // 副属性数组 [{stat: string, value: number}]
+  level         Int          @default(0) // 0-20
+  rarity        Int // 1-5星
+  locked        Boolean      @default(false)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
 
-  account          GameAccount       @relation(fields: [accountId], references: [id], onDelete: Cascade)
-  set              ArtifactSet       @relation(fields: [setId], references: [id])
-  equippedBy       AccountCharacter? @relation(fields: [equippedById], references: [id], onDelete: SetNull)
-  equippedById     String?
+  account      GameAccount       @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  set          ArtifactSet       @relation(fields: [setId], references: [id])
+  equippedBy   AccountCharacter? @relation(fields: [equippedById], references: [id], onDelete: SetNull)
+  equippedById String?
 
   @@index([accountId])
   @@index([setId])
@@ -174,21 +178,33 @@ enum WeaponType {
   CATALYST // 法器
 }
 
+// ==================== AI 系统 ====================
+
+enum AiFeature {
+  ARTIFACT_ANALYSIS
+  ARTIFACT_BATCH_ANALYSIS
+  ARTIFACT_POTENTIAL
+  BUILD_RECOMMENDATION
+  BUILD_COMPARISON
+  BUILD_REASONING
+  STRATEGY_CHAT
+}
+
 model Character {
-  id               String     @id
-  name             String
-  element          Element
-  weaponType       WeaponType?
-  rarity           Int? // 4 或 5
-  region           String? // 蒙德、璃月、稻妻、须弥、枫丹、纳塔、挪德卡莱
-  affiliation      String? // 所属组织
+  id                String      @id
+  name              String
+  element           Element
+  weaponType        WeaponType?
+  rarity            Int? // 4 或 5
+  region            String? // 蒙德、璃月、稻妻、须弥、枫丹、纳塔、挪德卡莱
+  affiliation       String? // 所属组织
   visionAffiliation String? // 神之眼所属地区
-  role             String? // 定位（如：辅助、输出）
-  talents          Json? // 天赋详情
-  constellations   Json? // 命之座详情
-  imageUrl         String?
-  createdAt        DateTime   @default(now())
-  updatedAt        DateTime   @updatedAt
+  role              String? // 定位（如：辅助、输出）
+  talents           Json? // 天赋详情
+  constellations    Json? // 命之座详情
+  imageUrl          String?
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
 
   accountCharacters AccountCharacter[]
   artifactBuilds    ArtifactBuild[]
@@ -219,15 +235,15 @@ model AccountCharacter {
 // ==================== 推荐系统 ====================
 
 model ArtifactBuild {
-  id          String   @id @default(uuid())
-  name        String   // Build 名称，如 "绝缘永冻甘雨"
-  description String?  // Build 说明
-  characterId String   // 适用角色
-  creatorId   String   // 创建者
-  isPublic    Boolean  @default(false) // 是否公开分享
+  id          String  @id @default(uuid())
+  name        String // Build 名称，如 "绝缘永冻甘雨"
+  description String? // Build 说明
+  characterId String // 适用角色
+  creatorId   String // 创建者
+  isPublic    Boolean @default(false) // 是否公开分享
 
   // 推荐套装配置
-  primarySetId   String  // 主要套装 (4件套)
+  primarySetId   String // 主要套装 (4件套)
   secondarySetId String? // 次要套装 (2件套，用于2+2配置)
   useFullSet     Boolean @default(true) // true: 4件套, false: 2+2件套
 
@@ -244,10 +260,10 @@ model ArtifactBuild {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  character    Character     @relation(fields: [characterId], references: [id])
-  creator      User          @relation("CreatedBuilds", fields: [creatorId], references: [id], onDelete: Cascade)
-  primarySet   ArtifactSet   @relation("PrimarySet", fields: [primarySetId], references: [id])
-  secondarySet ArtifactSet?  @relation("SecondarySet", fields: [secondarySetId], references: [id])
+  character    Character    @relation(fields: [characterId], references: [id])
+  creator      User         @relation("CreatedBuilds", fields: [creatorId], references: [id], onDelete: Cascade)
+  primarySet   ArtifactSet  @relation("PrimarySet", fields: [primarySetId], references: [id])
+  secondarySet ArtifactSet? @relation("SecondarySet", fields: [secondarySetId], references: [id])
   savedBy      SavedBuild[]
 
   @@index([characterId])
@@ -258,9 +274,9 @@ model ArtifactBuild {
 
 model SavedBuild {
   id        String   @id @default(uuid())
-  userId    String   // 保存此 Build 的用户
-  buildId   String   // 保存的 Build
-  notes     String?  // 用户的备注
+  userId    String // 保存此 Build 的用户
+  buildId   String // 保存的 Build
+  notes     String? // 用户的备注
   createdAt DateTime @default(now())
 
   user  User          @relation("SavedBuilds", fields: [userId], references: [id], onDelete: Cascade)
@@ -269,4 +285,65 @@ model SavedBuild {
   @@unique([userId, buildId]) // 同一用户不能重复保存同一 Build
   @@index([userId])
   @@index([buildId])
+}
+
+model AiResult {
+  id               String    @id @default(uuid())
+  userId           String
+  accountId        String?
+  artifactId       String?
+  characterId      String?
+  conversationId   String?
+  feature          AiFeature
+  input            Json
+  output           Json
+  model            String?
+  promptTokens     Int?
+  completionTokens Int?
+  totalTokens      Int?
+  aiGenerated      Boolean   @default(true)
+  language         String?
+  createdAt        DateTime  @default(now())
+
+  user     User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  account  GameAccount? @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  feedback AiFeedback?
+
+  @@index([userId])
+  @@index([accountId])
+  @@index([feature])
+  @@index([artifactId])
+  @@index([characterId])
+  @@index([conversationId])
+}
+
+model AiFeedback {
+  id         String   @id @default(uuid())
+  aiResultId String   @unique
+  userId     String
+  rating     Int
+  helpful    Boolean?
+  comment    String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  aiResult AiResult @relation(fields: [aiResultId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model AiUsage {
+  id           String   @id @default(uuid())
+  userId       String
+  date         DateTime
+  requestCount Int      @default(0)
+  totalTokens  Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@index([date])
 }

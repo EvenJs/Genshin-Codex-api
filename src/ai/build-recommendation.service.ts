@@ -1,5 +1,5 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { ArtifactSlot } from '@prisma/client';
+import { ArtifactSlot, Prisma } from '@prisma/client';
 import { AiService } from './ai.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { AccountOwnershipService } from '../accounts/account-ownership.service';
@@ -71,6 +71,7 @@ export interface AiBuildRecommendationResult {
   overallAnalysis: OverallAnalysis;
   generatedAt: string;
   aiGenerated: boolean;
+  aiResultId?: string;
 }
 
 export interface BuildComparisonResult {
@@ -101,6 +102,7 @@ export interface BuildComparisonResult {
       suggestion: string;
     }[];
   };
+  aiResultId?: string;
 }
 
 export interface BuildReasoningResult {
@@ -132,11 +134,13 @@ export interface BuildReasoningResult {
       priorities: string[];
     };
   };
+  aiResultId?: string;
 }
 
 export interface AiRecommendDto {
   preferences?: BuildPreferences;
   skipCache?: boolean;
+  language?: string;
 }
 
 export interface CompareBuildsDto {
@@ -144,6 +148,7 @@ export interface CompareBuildsDto {
     name: string;
     artifactIds: string[];
   }[];
+  language?: string;
 }
 
 @Injectable()
@@ -221,14 +226,32 @@ export class BuildRecommendationService {
 
     if (!aiAvailable) {
       // Fallback to algorithmic recommendation
-      return this.generateAlgorithmicRecommendation(context);
+      const fallback = this.generateAlgorithmicRecommendation(context, dto.language);
+      const aiResultId = await this.saveAiResult({
+        userId,
+        accountId,
+        characterId,
+        feature: 'BUILD_RECOMMENDATION',
+        input: {
+          characterId,
+          preferences: dto.preferences ?? null,
+          artifactIds: artifacts.map((a) => a.id),
+          setCount,
+          existingBuilds,
+        },
+        output: fallback,
+        aiGenerated: false,
+        language: dto.language,
+      });
+      return { ...fallback, aiResultId };
     }
 
     // Generate AI recommendation
     try {
-      const prompt = buildCharacterRecommendationPrompt(context);
+      const prompt = buildCharacterRecommendationPrompt(context, dto.language);
 
-      const response = await this.aiService.chat(
+      const response = await this.aiService.chatForUser(
+        userId,
         {
           messages: [
             { role: 'system', content: BUILD_RECOMMENDATION_SYSTEM_PROMPT },
@@ -243,16 +266,56 @@ export class BuildRecommendationService {
         response.content,
       );
 
-      return {
+      const result: AiBuildRecommendationResult = {
         character: context.character,
         builds: parsed.builds,
         overallAnalysis: parsed.overallAnalysis,
         generatedAt: new Date().toISOString(),
         aiGenerated: true,
       };
+
+      const aiResultId = await this.saveAiResult({
+        userId,
+        accountId,
+        characterId,
+        feature: 'BUILD_RECOMMENDATION',
+        input: {
+          characterId,
+          preferences: dto.preferences ?? null,
+          artifactIds: artifacts.map((a) => a.id),
+          setCount,
+          existingBuilds,
+        },
+        output: result,
+        aiGenerated: true,
+        language: dto.language,
+        model: response.model ?? null,
+        promptTokens: response.promptTokens ?? null,
+        completionTokens: response.completionTokens ?? null,
+        totalTokens: response.totalTokens ?? null,
+      });
+
+      return { ...result, aiResultId };
     } catch (error) {
       this.logger.warn(`AI recommendation failed, falling back to algorithmic: ${error}`);
-      return this.generateAlgorithmicRecommendation(context);
+      const fallback = this.generateAlgorithmicRecommendation(context, dto.language);
+      const aiResultId = await this.saveAiResult({
+        userId,
+        accountId,
+        characterId,
+        feature: 'BUILD_RECOMMENDATION',
+        input: {
+          characterId,
+          preferences: dto.preferences ?? null,
+          artifactIds: artifacts.map((a) => a.id),
+          setCount,
+          existingBuilds,
+        },
+        output: fallback,
+        aiGenerated: false,
+        language: dto.language,
+      });
+      return { ...fallback, aiResultId };
     }
   }
 
@@ -311,7 +374,20 @@ export class BuildRecommendationService {
 
     if (!aiAvailable) {
       // Fallback to algorithmic comparison
-      return this.generateAlgorithmicComparison(character, builds);
+      const fallback = this.generateAlgorithmicComparison(character, builds, dto.language);
+      const aiResultId = await this.saveAiResult({
+        userId,
+        accountId,
+        characterId,
+        feature: 'BUILD_COMPARISON',
+        input: {
+          buildConfigs: dto.buildConfigs,
+        },
+        output: fallback,
+        aiGenerated: false,
+        language: dto.language,
+      });
+      return { ...fallback, aiResultId };
     }
 
     try {
@@ -325,9 +401,10 @@ export class BuildRecommendationService {
           role: character.role || undefined,
         },
         builds,
+        dto.language,
       );
 
-      const response = await this.aiService.chat({
+      const response = await this.aiService.chatForUser(userId, {
         messages: [
           { role: 'system', content: BUILD_RECOMMENDATION_SYSTEM_PROMPT },
           { role: 'user', content: prompt },
@@ -335,10 +412,41 @@ export class BuildRecommendationService {
         temperature: 0.3,
       });
 
-      return this.parseAiResponse<BuildComparisonResult>(response.content);
+      const parsed = this.parseAiResponse<BuildComparisonResult>(response.content);
+      const aiResultId = await this.saveAiResult({
+        userId,
+        accountId,
+        characterId,
+        feature: 'BUILD_COMPARISON',
+        input: {
+          buildConfigs: dto.buildConfigs,
+        },
+        output: parsed,
+        aiGenerated: true,
+        language: dto.language,
+        model: response.model ?? null,
+        promptTokens: response.promptTokens ?? null,
+        completionTokens: response.completionTokens ?? null,
+        totalTokens: response.totalTokens ?? null,
+      });
+
+      return { ...parsed, aiResultId };
     } catch (error) {
       this.logger.warn(`AI comparison failed, falling back to algorithmic: ${error}`);
-      return this.generateAlgorithmicComparison(character, builds);
+      const fallback = this.generateAlgorithmicComparison(character, builds, dto.language);
+      const aiResultId = await this.saveAiResult({
+        userId,
+        accountId,
+        characterId,
+        feature: 'BUILD_COMPARISON',
+        input: {
+          buildConfigs: dto.buildConfigs,
+        },
+        output: fallback,
+        aiGenerated: false,
+        language: dto.language,
+      });
+      return { ...fallback, aiResultId };
     }
   }
 
@@ -350,6 +458,7 @@ export class BuildRecommendationService {
     accountId: string,
     characterId: string,
     artifactIds: string[],
+    language?: string,
   ): Promise<BuildReasoningResult> {
     // Validate ownership
     await this.ownership.validate(userId, accountId);
@@ -383,7 +492,20 @@ export class BuildRecommendationService {
     const aiAvailable = await this.aiService.isAvailable();
 
     if (!aiAvailable) {
-      return this.generateAlgorithmicReasoning(character, artifacts, setConfig);
+      const fallback = this.generateAlgorithmicReasoning(character, artifacts, setConfig, language);
+      const aiResultId = await this.saveAiResult({
+        userId,
+        accountId,
+        characterId,
+        feature: 'BUILD_REASONING',
+        input: {
+          artifactIds,
+        },
+        output: fallback,
+        aiGenerated: false,
+        language,
+      });
+      return { ...fallback, aiResultId };
     }
 
     try {
@@ -398,9 +520,10 @@ export class BuildRecommendationService {
         },
         artifacts.map(this.mapArtifactForBuild),
         setConfig,
+        language,
       );
 
-      const response = await this.aiService.chat({
+      const response = await this.aiService.chatForUser(userId, {
         messages: [
           { role: 'system', content: BUILD_RECOMMENDATION_SYSTEM_PROMPT },
           { role: 'user', content: prompt },
@@ -408,10 +531,40 @@ export class BuildRecommendationService {
         temperature: 0.3,
       });
 
-      return this.parseAiResponse<BuildReasoningResult>(response.content);
+      const parsed = this.parseAiResponse<BuildReasoningResult>(response.content);
+      const aiResultId = await this.saveAiResult({
+        userId,
+        accountId,
+        characterId,
+        feature: 'BUILD_REASONING',
+        input: {
+          artifactIds,
+        },
+        output: parsed,
+        aiGenerated: true,
+        language,
+        model: response.model ?? null,
+        promptTokens: response.promptTokens ?? null,
+        completionTokens: response.completionTokens ?? null,
+        totalTokens: response.totalTokens ?? null,
+      });
+      return { ...parsed, aiResultId };
     } catch (error) {
       this.logger.warn(`AI reasoning failed, falling back to algorithmic: ${error}`);
-      return this.generateAlgorithmicReasoning(character, artifacts, setConfig);
+      const fallback = this.generateAlgorithmicReasoning(character, artifacts, setConfig, language);
+      const aiResultId = await this.saveAiResult({
+        userId,
+        accountId,
+        characterId,
+        feature: 'BUILD_REASONING',
+        input: {
+          artifactIds,
+        },
+        output: fallback,
+        aiGenerated: false,
+        language,
+      });
+      return { ...fallback, aiResultId };
     }
   }
 
@@ -569,6 +722,47 @@ export class BuildRecommendationService {
     }));
   }
 
+  private async saveAiResult(params: {
+    userId: string;
+    accountId: string;
+    characterId?: string;
+    feature: 'BUILD_RECOMMENDATION' | 'BUILD_COMPARISON' | 'BUILD_REASONING';
+    input: unknown;
+    output: unknown;
+    aiGenerated: boolean;
+    language?: string;
+    model?: string | null;
+    promptTokens?: number | null;
+    completionTokens?: number | null;
+    totalTokens?: number | null;
+  }): Promise<string> {
+    const input = this.toJsonInput(params.input);
+    const output = this.toJsonInput(params.output);
+    const result = await this.prisma.aiResult.create({
+      data: {
+        userId: params.userId,
+        accountId: params.accountId,
+        characterId: params.characterId,
+        feature: params.feature,
+        input,
+        output,
+        aiGenerated: params.aiGenerated,
+        language: params.language,
+        model: params.model ?? undefined,
+        promptTokens: params.promptTokens ?? undefined,
+        completionTokens: params.completionTokens ?? undefined,
+        totalTokens: params.totalTokens ?? undefined,
+      },
+      select: { id: true },
+    });
+
+    return result.id;
+  }
+
+  private toJsonInput(value: unknown): Prisma.InputJsonValue {
+    return JSON.parse(JSON.stringify(value ?? null)) as Prisma.InputJsonValue;
+  }
+
   private mapArtifactForBuild = (artifact: any): ArtifactForBuild => ({
     id: artifact.id,
     slot: artifact.slot,
@@ -665,6 +859,7 @@ export class BuildRecommendationService {
 
   private generateAlgorithmicRecommendation(
     context: BuildRecommendationContext,
+    language?: string,
   ): AiBuildRecommendationResult {
     const { character, inventory } = context;
     const builds: RecommendedBuild[] = [];
@@ -685,12 +880,13 @@ export class BuildRecommendationService {
     if (fourPieceSets.length > 0) {
       const primarySet = fourPieceSets[0]!;
       const build = this.createAlgorithmicBuild(
-        `4-Piece ${primarySet.name}`,
+        this.t(language, `4-Piece ${primarySet.name}`, `${primarySet.name} 4件套`),
         primarySet,
         null,
         true,
         inventory.artifacts,
         1,
+        language,
       );
       builds.push(build);
     }
@@ -700,19 +896,20 @@ export class BuildRecommendationService {
       const primary = twoPieceSets[0]!;
       const secondary = twoPieceSets[1]!;
       const build = this.createAlgorithmicBuild(
-        `2+2 ${primary.name} + ${secondary.name}`,
+        this.t(language, `2+2 ${primary.name} + ${secondary.name}`, `2+2 ${primary.name} + ${secondary.name}`),
         primary,
         secondary,
         false,
         inventory.artifacts,
         builds.length + 1,
+        language,
       );
       builds.push(build);
     }
 
     // If no builds generated, create a best-available build
     if (builds.length === 0 && inventory.artifacts.length > 0) {
-      const build = this.createBestAvailableBuild(inventory.artifacts);
+      const build = this.createBestAvailableBuild(inventory.artifacts, language);
       builds.push(build);
     }
 
@@ -722,8 +919,8 @@ export class BuildRecommendationService {
       overallAnalysis: {
         inventoryQuality: this.assessInventoryQuality(inventory),
         bestBuildIndex: 0,
-        farmingSuggestions: this.suggestFarming(character, inventory),
-        keyMissingPieces: this.identifyMissingPieces(inventory),
+        farmingSuggestions: this.suggestFarming(character, inventory, language),
+        keyMissingPieces: this.identifyMissingPieces(inventory, language),
       },
       generatedAt: new Date().toISOString(),
       aiGenerated: false,
@@ -737,6 +934,7 @@ export class BuildRecommendationService {
     useFullSet: boolean,
     artifacts: ArtifactForBuild[],
     priority: number,
+    language?: string,
   ): RecommendedBuild {
     const slots: ArtifactSlot[] = ['FLOWER', 'PLUME', 'SANDS', 'GOBLET', 'CIRCLET'];
     const selectedArtifacts: Record<string, BuildArtifactSelection> = {};
@@ -766,7 +964,13 @@ export class BuildRecommendationService {
       selectedArtifacts[slot] = {
         artifactId: best?.id || null,
         score: Math.round(bestScore),
-        notes: best ? `Best ${slot.toLowerCase()} from ${best.setName}` : 'No suitable artifact found',
+        notes: best
+          ? this.t(
+              language,
+              `Best ${this.slotLabel(slot, language)} from ${best.setName}`,
+              `来自${best.setName}的最佳${this.slotLabel(slot, language)}`,
+            )
+          : this.t(language, 'No suitable artifact found', '暂无合适的圣遗物'),
       };
 
       totalScore += bestScore;
@@ -775,8 +979,12 @@ export class BuildRecommendationService {
     return {
       name,
       description: useFullSet
-        ? `4-piece ${primarySet.name} build`
-        : `2+2 build with ${primarySet.name} and ${secondarySet?.name || 'mixed'}`,
+        ? this.t(language, `4-piece ${primarySet.name} build`, `${primarySet.name} 四件套配装`)
+        : this.t(
+            language,
+            `2+2 build with ${primarySet.name} and ${secondarySet?.name || 'mixed'}`,
+            `${primarySet.name} 与 ${secondarySet?.name || '散搭'} 的2+2配装`,
+          ),
       priority,
       setConfiguration: {
         type: useFullSet ? '4piece' : '2plus2',
@@ -799,13 +1007,23 @@ export class BuildRecommendationService {
         estimatedCritDmg: '~100%',
         otherKeyStats: [],
       },
-      reasoning: `This build uses the ${useFullSet ? '4-piece' : '2+2'} set configuration based on your available artifacts.`,
-      improvements: ['Level up artifacts to +20', 'Look for better sub-stats'],
+      reasoning: this.t(
+        language,
+        `This build uses the ${useFullSet ? '4-piece' : '2+2'} set configuration based on your available artifacts.`,
+        `该配装基于你的库存选择${useFullSet ? '4件套' : '2+2'}套装组合。`,
+      ),
+      improvements: [
+        this.t(language, 'Level up artifacts to +20', '建议圣遗物强化到 +20'),
+        this.t(language, 'Look for better sub-stats', '优先刷取更优副词条'),
+      ],
       viability: totalScore > 300 ? 'good' : totalScore > 200 ? 'workable' : 'needs-improvement',
     };
   }
 
-  private createBestAvailableBuild(artifacts: ArtifactForBuild[]): RecommendedBuild {
+  private createBestAvailableBuild(
+    artifacts: ArtifactForBuild[],
+    language?: string,
+  ): RecommendedBuild {
     const slots: ArtifactSlot[] = ['FLOWER', 'PLUME', 'SANDS', 'GOBLET', 'CIRCLET'];
     const selectedArtifacts: Record<string, BuildArtifactSelection> = {};
     let totalScore = 0;
@@ -822,20 +1040,26 @@ export class BuildRecommendationService {
       selectedArtifacts[slot] = {
         artifactId: best?.id || null,
         score: Math.round(score),
-        notes: best ? `Best available ${slot.toLowerCase()}` : 'No artifact available',
+        notes: best
+          ? this.t(
+              language,
+              `Best available ${this.slotLabel(slot, language)}`,
+              `当前最佳${this.slotLabel(slot, language)}`,
+            )
+          : this.t(language, 'No artifact available', '暂无可用圣遗物'),
       };
       totalScore += score;
     }
 
     return {
-      name: 'Best Available Build',
-      description: 'Using the highest quality artifacts from your inventory',
+      name: this.t(language, 'Best Available Build', '最优可用配装'),
+      description: this.t(language, 'Using the highest quality artifacts from your inventory', '使用库存中品质最佳的圣遗物'),
       priority: 1,
       setConfiguration: {
         type: 'rainbow',
-        primarySet: 'Mixed',
+        primarySet: this.t(language, 'Mixed', '散搭'),
         secondarySet: null,
-        setBonus: 'No complete set bonus',
+        setBonus: this.t(language, 'No complete set bonus', '暂无完整套装效果'),
       },
       recommendedMainStats: {
         SANDS: 'ATK%',
@@ -850,8 +1074,15 @@ export class BuildRecommendationService {
         estimatedCritDmg: '~80%',
         otherKeyStats: [],
       },
-      reasoning: 'This build selects your best individual artifacts regardless of set bonuses.',
-      improvements: ['Farm artifact domains to complete sets', 'Focus on crit sub-stats'],
+      reasoning: this.t(
+        language,
+        'This build selects your best individual artifacts regardless of set bonuses.',
+        '此方案优先选择单件最优，不依赖套装效果。',
+      ),
+      improvements: [
+        this.t(language, 'Farm artifact domains to complete sets', '继续刷本凑齐套装效果'),
+        this.t(language, 'Focus on crit sub-stats', '优先提升暴击相关副词条'),
+      ],
       viability: 'needs-improvement',
     };
   }
@@ -897,33 +1128,43 @@ export class BuildRecommendationService {
     return 'limited';
   }
 
-  private suggestFarming(character: CharacterForBuild, inventory: UserInventoryContext): string[] {
+  private suggestFarming(
+    character: CharacterForBuild,
+    inventory: UserInventoryContext,
+    language?: string,
+  ): string[] {
     const suggestions: string[] = [];
 
     // Generic suggestions based on element
-    const elementDomains: Record<string, string> = {
-      PYRO: 'Crimson Witch domain',
-      HYDRO: 'Heart of Depth domain',
-      CRYO: 'Blizzard Strayer domain',
-      ELECTRO: 'Thundering Fury domain',
-      ANEMO: 'Viridescent Venerer domain',
-      GEO: 'Archaic Petra domain',
-      DENDRO: 'Deepwood Memories domain',
+    const elementDomains: Record<string, { en: string; zh: string }> = {
+      PYRO: { en: 'Crimson Witch domain', zh: '魔女套秘境' },
+      HYDRO: { en: 'Heart of Depth domain', zh: '沉沦之心秘境' },
+      CRYO: { en: 'Blizzard Strayer domain', zh: '冰风迷途的勇士秘境' },
+      ELECTRO: { en: 'Thundering Fury domain', zh: '如雷的盛怒秘境' },
+      ANEMO: { en: 'Viridescent Venerer domain', zh: '翠绿之影秘境' },
+      GEO: { en: 'Archaic Petra domain', zh: '悠古的磐岩秘境' },
+      DENDRO: { en: 'Deepwood Memories domain', zh: '深林的记忆秘境' },
     };
 
     if (elementDomains[character.element]) {
-      suggestions.push(elementDomains[character.element]);
+      suggestions.push(this.t(language, elementDomains[character.element].en, elementDomains[character.element].zh));
     }
 
     // Suggest Emblem for characters needing ER
     if (!inventory.setCount['emblem-of-severed-fate'] || inventory.setCount['emblem-of-severed-fate'] < 4) {
-      suggestions.push('Emblem of Severed Fate domain (versatile 4pc set)');
+      suggestions.push(
+        this.t(
+          language,
+          'Emblem of Severed Fate domain (versatile 4pc set)',
+          '绝缘之旗印秘境（泛用4件套）',
+        ),
+      );
     }
 
     return suggestions.slice(0, 3);
   }
 
-  private identifyMissingPieces(inventory: UserInventoryContext): string[] {
+  private identifyMissingPieces(inventory: UserInventoryContext, language?: string): string[] {
     const missing: string[] = [];
     const slots: ArtifactSlot[] = ['FLOWER', 'PLUME', 'SANDS', 'GOBLET', 'CIRCLET'];
 
@@ -937,7 +1178,13 @@ export class BuildRecommendationService {
       });
 
       if (highQuality.length === 0) {
-        missing.push(`High-quality ${slot.toLowerCase()} with double crit`);
+        missing.push(
+          this.t(
+            language,
+            `High-quality ${this.slotLabel(slot, language)} with double crit`,
+            `高质量双暴${this.slotLabel(slot, language)}`,
+          ),
+        );
       }
     }
 
@@ -947,6 +1194,7 @@ export class BuildRecommendationService {
   private generateAlgorithmicComparison(
     character: any,
     builds: { name: string; artifacts: ArtifactForBuild[]; setBonus: string }[],
+    language?: string,
   ): BuildComparisonResult {
     const scoredBuilds = builds.map((build, index) => {
       const totalScore = build.artifacts.reduce(
@@ -960,8 +1208,8 @@ export class BuildRecommendationService {
         overallScore: Math.min(100, Math.round(totalScore / 5)),
         damageScore: Math.min(100, Math.round(totalScore / 5)),
         consistencyScore: Math.min(100, Math.round(totalScore / 6)),
-        strengths: ['Available artifacts'],
-        weaknesses: totalScore < 200 ? ['Needs improvement'] : [],
+        strengths: [this.t(language, 'Available artifacts', '可用圣遗物较齐')],
+        weaknesses: totalScore < 200 ? [this.t(language, 'Needs improvement', '整体强度不足')] : [],
       };
     });
 
@@ -976,19 +1224,27 @@ export class BuildRecommendationService {
           index: winner.index,
           name: winner.name,
           marginOfVictory: 'moderate',
-          explanation: `${winner.name} has the highest overall stat quality.`,
+          explanation: this.t(
+            language,
+            `${winner.name} has the highest overall stat quality.`,
+            `${winner.name} 的整体词条质量最高。`,
+          ),
         },
         situationalNotes: {
           forBossRush: winner.index,
           forAbyss: winner.index,
           forOverworld: winner.index,
-          reasoning: 'Based on overall artifact quality.',
+          reasoning: this.t(language, 'Based on overall artifact quality.', '基于整体圣遗物质量评估。'),
         },
         improvements: scoredBuilds
           .filter((b) => b.overallScore < 80)
           .map((b) => ({
             buildIndex: b.index,
-            suggestion: 'Upgrade artifacts to +20 and look for better sub-stats',
+            suggestion: this.t(
+              language,
+              'Upgrade artifacts to +20 and look for better sub-stats',
+              '建议将圣遗物强化到 +20，并追求更好的副词条',
+            ),
           })),
       },
     };
@@ -998,6 +1254,7 @@ export class BuildRecommendationService {
     character: any,
     artifacts: any[],
     setConfig: { primarySet: string; secondarySet?: string; useFullSet: boolean },
+    language?: string,
   ): BuildReasoningResult {
     // Calculate crit value
     let critRate = 5;
@@ -1032,7 +1289,11 @@ export class BuildRecommendationService {
     return {
       reasoning: {
         setChoice: {
-          explanation: `${setConfig.useFullSet ? '4-piece' : '2+2'} ${setConfig.primarySet} provides good synergy with ${character.name}'s kit.`,
+          explanation: this.t(
+            language,
+            `${setConfig.useFullSet ? '4-piece' : '2+2'} ${setConfig.primarySet} provides good synergy with ${character.name}'s kit.`,
+            `${setConfig.useFullSet ? '4件套' : '2+2'} ${setConfig.primarySet} 与 ${character.name} 的机制有良好联动。`,
+          ),
           alternativeSets: [],
           setScore: 70,
         },
@@ -1040,17 +1301,17 @@ export class BuildRecommendationService {
           SANDS: {
             chosen: artifacts.find((a) => a.slot === 'SANDS')?.mainStat || 'Unknown',
             optimal: 'ATK%',
-            assessment: 'Acceptable choice',
+            assessment: this.t(language, 'Acceptable choice', '可接受的选择'),
           },
           GOBLET: {
             chosen: artifacts.find((a) => a.slot === 'GOBLET')?.mainStat || 'Unknown',
             optimal: 'Elemental DMG%',
-            assessment: 'Acceptable choice',
+            assessment: this.t(language, 'Acceptable choice', '可接受的选择'),
           },
           CIRCLET: {
             chosen: artifacts.find((a) => a.slot === 'CIRCLET')?.mainStat || 'Unknown',
             optimal: 'Crit Rate%',
-            assessment: 'Acceptable choice',
+            assessment: this.t(language, 'Acceptable choice', '可接受的选择'),
           },
         },
         subStats: {
@@ -1059,22 +1320,54 @@ export class BuildRecommendationService {
           wastedStats: [...new Set(wastedStats)],
           assessment:
             totalCV > 200
-              ? 'Excellent sub-stat quality'
+              ? this.t(language, 'Excellent sub-stat quality', '副词条质量非常优秀')
               : totalCV > 150
-                ? 'Good sub-stat quality'
-                : 'Needs improvement',
+                ? this.t(language, 'Good sub-stat quality', '副词条质量不错')
+                : this.t(language, 'Needs improvement', '副词条仍需提升'),
         },
         synergy: {
-          withKit: `This build supports ${character.name}'s primary damage dealing capabilities.`,
-          withTeam: 'Works well in most team compositions.',
-          playstyleNotes: 'Focus on maximizing skill and burst damage.',
+          withKit: this.t(
+            language,
+            `This build supports ${character.name}'s primary damage dealing capabilities.`,
+            `该配装能支撑 ${character.name} 的主要输出能力。`,
+          ),
+          withTeam: this.t(language, 'Works well in most team compositions.', '适用于大多数队伍配置。'),
+          playstyleNotes: this.t(language, 'Focus on maximizing skill and burst damage.', '重视技能与爆发伤害的输出节奏。'),
         },
         overallVerdict: {
           rating: totalCV > 200 ? 'A' : totalCV > 150 ? 'B' : 'C',
-          summary: `This build achieves ${Math.round(critRate)}% Crit Rate and ${Math.round(critDmg)}% Crit DMG with ${effectiveSubStats} effective sub-stat rolls.`,
-          priorities: wastedStats.length > 0 ? ['Replace artifacts with wasted stats'] : ['Level up artifacts to +20'],
+          summary: this.t(
+            language,
+            `This build achieves ${Math.round(critRate)}% Crit Rate and ${Math.round(critDmg)}% Crit DMG with ${effectiveSubStats} effective sub-stat rolls.`,
+            `该配装拥有约 ${Math.round(critRate)}% 暴击率与 ${Math.round(critDmg)}% 暴击伤害，并包含 ${effectiveSubStats} 条有效副词条。`,
+          ),
+          priorities:
+            wastedStats.length > 0
+              ? [this.t(language, 'Replace artifacts with wasted stats', '替换浪费词条较多的圣遗物')]
+              : [this.t(language, 'Level up artifacts to +20', '建议将圣遗物强化到 +20')],
         },
       },
     };
+  }
+
+  private t(language: string | undefined, en: string, zh: string): string {
+    return this.normalizeLanguage(language) === 'en' ? en : zh;
+  }
+
+  private slotLabel(slot: ArtifactSlot, language?: string): string {
+    const labels: Record<ArtifactSlot, { en: string; zh: string }> = {
+      FLOWER: { en: 'flower', zh: '花' },
+      PLUME: { en: 'plume', zh: '羽' },
+      SANDS: { en: 'sands', zh: '沙' },
+      GOBLET: { en: 'goblet', zh: '杯' },
+      CIRCLET: { en: 'circlet', zh: '头' },
+    };
+    const label = labels[slot];
+    return this.normalizeLanguage(language) === 'en' ? label.en : label.zh;
+  }
+
+  private normalizeLanguage(language?: string): 'en' | 'zh' {
+    if (language?.toLowerCase().startsWith('en')) return 'en';
+    return 'zh';
   }
 }

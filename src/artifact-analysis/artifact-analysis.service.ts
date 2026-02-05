@@ -1,6 +1,7 @@
 import { Injectable, Logger, NotFoundException, BadRequestException } from '@nestjs/common';
 import { ArtifactSlot } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { Prisma } from '@prisma/client';
 import { AiService } from '../ai/ai.service';
 import { AccountOwnershipService } from '../accounts/account-ownership.service';
 import {
@@ -95,6 +96,7 @@ export class ArtifactAnalysisService {
     artifactId: string,
     characterId?: string,
     skipCache = false,
+    language?: string,
   ): Promise<ArtifactAnalysisResult> {
     await this.ownership.validate(userId, accountId);
 
@@ -141,17 +143,53 @@ export class ArtifactAnalysisService {
 
     // Try AI analysis, fall back to algorithmic if AI unavailable
     let aiAnalysis: any = null;
+    let aiResponse: { model?: string; promptTokens?: number; completionTokens?: number; totalTokens?: number } | null = null;
     try {
       const isAiAvailable = await this.aiService.isAvailable();
       if (isAiAvailable) {
-        aiAnalysis = await this.getAiAnalysis(artifactForAnalysis, characterContext, skipCache);
+        const result = await this.getAiAnalysis(
+          userId,
+          artifactForAnalysis,
+          characterContext,
+          skipCache,
+          language,
+        );
+        aiAnalysis = result?.analysis ?? null;
+        aiResponse = result?.response ?? null;
       }
     } catch (error) {
       this.logger.warn(`AI analysis failed, using algorithmic fallback: ${error}`);
     }
 
     // Merge AI analysis with algorithmic calculations
-    return this.buildAnalysisResult(artifactId, artifactForAnalysis, algorithmicScore, aiAnalysis);
+    const analysisResult = this.buildAnalysisResult(
+      artifactId,
+      artifactForAnalysis,
+      algorithmicScore,
+      aiAnalysis,
+    );
+
+    const aiResultId = await this.saveAiResult({
+      userId,
+      accountId,
+      artifactId,
+      characterId,
+      feature: 'ARTIFACT_ANALYSIS',
+      input: {
+        artifact: artifactForAnalysis,
+        characterId,
+        skipCache,
+      },
+      output: analysisResult,
+      aiGenerated: Boolean(aiAnalysis),
+      language,
+      model: aiResponse?.model ?? null,
+      promptTokens: aiResponse?.promptTokens ?? null,
+      completionTokens: aiResponse?.completionTokens ?? null,
+      totalTokens: aiResponse?.totalTokens ?? null,
+    });
+
+    return { ...analysisResult, aiResultId };
   }
 
   /**
@@ -162,6 +200,7 @@ export class ArtifactAnalysisService {
     accountId: string,
     artifactIds: string[],
     characterId?: string,
+    language?: string,
   ): Promise<BatchAnalysisResult> {
     await this.ownership.validate(userId, accountId);
 
@@ -223,20 +262,44 @@ export class ArtifactAnalysisService {
 
     // Try AI batch analysis
     let aiAnalysis: any = null;
+    let aiResponse: { model?: string; promptTokens?: number; completionTokens?: number; totalTokens?: number } | null = null;
     try {
       const isAiAvailable = await this.aiService.isAvailable();
       if (isAiAvailable) {
-        aiAnalysis = await this.getAiBatchAnalysis(
+        const result = await this.getAiBatchAnalysis(
+          userId,
           artifactsForAnalysis,
           characterContext,
+          language,
         );
+        aiAnalysis = result?.analysis ?? null;
+        aiResponse = result?.response ?? null;
       }
     } catch (error) {
       this.logger.warn(`AI batch analysis failed: ${error}`);
     }
 
     // Build batch result
-    return this.buildBatchResult(scoredArtifacts, aiAnalysis);
+    const batchResult = this.buildBatchResult(scoredArtifacts, aiAnalysis, language);
+
+    const aiResultId = await this.saveAiResult({
+      userId,
+      accountId,
+      feature: 'ARTIFACT_BATCH_ANALYSIS',
+      input: {
+        artifactIds,
+        characterId,
+      },
+      output: batchResult,
+      aiGenerated: Boolean(aiAnalysis),
+      language,
+      model: aiResponse?.model ?? null,
+      promptTokens: aiResponse?.promptTokens ?? null,
+      completionTokens: aiResponse?.completionTokens ?? null,
+      totalTokens: aiResponse?.totalTokens ?? null,
+    });
+
+    return { ...batchResult, aiResultId };
   }
 
   /**
@@ -246,6 +309,7 @@ export class ArtifactAnalysisService {
     userId: string,
     accountId: string,
     artifactId: string,
+    language?: string,
   ): Promise<PotentialEvaluationResult> {
     await this.ownership.validate(userId, accountId);
 
@@ -277,10 +341,17 @@ export class ArtifactAnalysisService {
 
     // Try AI potential evaluation
     let aiPotential: any = null;
+    let aiResponse: { model?: string; promptTokens?: number; completionTokens?: number; totalTokens?: number } | null = null;
     try {
       const isAiAvailable = await this.aiService.isAvailable();
       if (isAiAvailable) {
-        aiPotential = await this.getAiPotentialEvaluation(artifactForAnalysis);
+        const result = await this.getAiPotentialEvaluation(
+          userId,
+          artifactForAnalysis,
+          language,
+        );
+        aiPotential = result?.analysis ?? null;
+        aiResponse = result?.response ?? null;
       }
     } catch (error) {
       this.logger.warn(`AI potential evaluation failed: ${error}`);
@@ -289,7 +360,7 @@ export class ArtifactAnalysisService {
     // Calculate upgrade scenarios algorithmically
     const scenarios = this.calculateUpgradeScenarios(artifactForAnalysis, remainingUpgrades);
 
-    return {
+    const result: PotentialEvaluationResult = {
       artifactId,
       currentState: {
         score: currentScore.score,
@@ -314,6 +385,25 @@ export class ArtifactAnalysisService {
       riskAssessment: aiPotential?.riskAssessment || this.assessUpgradeRisk(artifactForAnalysis),
       analyzedAt: new Date().toISOString(),
     };
+
+    const aiResultId = await this.saveAiResult({
+      userId,
+      accountId,
+      artifactId,
+      feature: 'ARTIFACT_POTENTIAL',
+      input: {
+        artifact: artifactForAnalysis,
+      },
+      output: result,
+      aiGenerated: Boolean(aiPotential),
+      language,
+      model: aiResponse?.model ?? null,
+      promptTokens: aiResponse?.promptTokens ?? null,
+      completionTokens: aiResponse?.completionTokens ?? null,
+      totalTokens: aiResponse?.totalTokens ?? null,
+    });
+
+    return { ...result, aiResultId };
   }
 
   /**
@@ -580,14 +670,17 @@ export class ArtifactAnalysisService {
    * Get AI analysis for a single artifact
    */
   private async getAiAnalysis(
+    userId: string,
     artifact: ArtifactForAnalysis,
     characterContext?: CharacterContext,
     skipCache = false,
-  ): Promise<any> {
-    const prompt = buildArtifactAnalysisPrompt(artifact, characterContext);
+    language?: string,
+  ): Promise<{ analysis: any; response: { model?: string; promptTokens?: number; completionTokens?: number; totalTokens?: number } } | null> {
+    const prompt = buildArtifactAnalysisPrompt(artifact, characterContext, language);
 
     try {
-      const response = await this.aiService.chat(
+      const response = await this.aiService.chatForUser(
+        userId,
         {
           messages: [
             { role: 'system', content: ARTIFACT_ANALYSIS_SYSTEM_PROMPT },
@@ -598,7 +691,10 @@ export class ArtifactAnalysisService {
         !skipCache,
       );
 
-      return this.parseAiResponse(response.content);
+      return {
+        analysis: this.parseAiResponse(response.content),
+        response,
+      };
     } catch (error) {
       this.logger.error(`AI analysis error: ${error}`);
       return null;
@@ -609,13 +705,16 @@ export class ArtifactAnalysisService {
    * Get AI batch analysis
    */
   private async getAiBatchAnalysis(
+    userId: string,
     artifacts: ArtifactForAnalysis[],
     characterContext?: CharacterContext,
-  ): Promise<any> {
-    const prompt = buildBatchAnalysisPrompt(artifacts, characterContext);
+    language?: string,
+  ): Promise<{ analysis: any; response: { model?: string; promptTokens?: number; completionTokens?: number; totalTokens?: number } } | null> {
+    const prompt = buildBatchAnalysisPrompt(artifacts, characterContext, language);
 
     try {
-      const response = await this.aiService.chat(
+      const response = await this.aiService.chatForUser(
+        userId,
         {
           messages: [
             { role: 'system', content: ARTIFACT_ANALYSIS_SYSTEM_PROMPT },
@@ -626,7 +725,10 @@ export class ArtifactAnalysisService {
         true, // Use cache
       );
 
-      return this.parseAiResponse(response.content);
+      return {
+        analysis: this.parseAiResponse(response.content),
+        response,
+      };
     } catch (error) {
       this.logger.error(`AI batch analysis error: ${error}`);
       return null;
@@ -636,11 +738,16 @@ export class ArtifactAnalysisService {
   /**
    * Get AI potential evaluation
    */
-  private async getAiPotentialEvaluation(artifact: ArtifactForAnalysis): Promise<any> {
-    const prompt = buildPotentialEvaluationPrompt(artifact);
+  private async getAiPotentialEvaluation(
+    userId: string,
+    artifact: ArtifactForAnalysis,
+    language?: string,
+  ): Promise<{ analysis: any; response: { model?: string; promptTokens?: number; completionTokens?: number; totalTokens?: number } } | null> {
+    const prompt = buildPotentialEvaluationPrompt(artifact, language);
 
     try {
-      const response = await this.aiService.chat(
+      const response = await this.aiService.chatForUser(
+        userId,
         {
           messages: [
             { role: 'system', content: ARTIFACT_ANALYSIS_SYSTEM_PROMPT },
@@ -651,11 +758,57 @@ export class ArtifactAnalysisService {
         true,
       );
 
-      return this.parseAiResponse(response.content);
+      return {
+        analysis: this.parseAiResponse(response.content),
+        response,
+      };
     } catch (error) {
       this.logger.error(`AI potential evaluation error: ${error}`);
       return null;
     }
+  }
+
+  private async saveAiResult(params: {
+    userId: string;
+    accountId: string;
+    artifactId?: string;
+    characterId?: string;
+    feature: 'ARTIFACT_ANALYSIS' | 'ARTIFACT_BATCH_ANALYSIS' | 'ARTIFACT_POTENTIAL';
+    input: unknown;
+    output: unknown;
+    aiGenerated: boolean;
+    language?: string;
+    model?: string | null;
+    promptTokens?: number | null;
+    completionTokens?: number | null;
+    totalTokens?: number | null;
+  }): Promise<string> {
+    const input = this.toJsonInput(params.input);
+    const output = this.toJsonInput(params.output);
+    const result = await this.prisma.aiResult.create({
+      data: {
+        userId: params.userId,
+        accountId: params.accountId,
+        artifactId: params.artifactId,
+        characterId: params.characterId,
+        feature: params.feature,
+        input,
+        output,
+        aiGenerated: params.aiGenerated,
+        language: params.language,
+        model: params.model ?? undefined,
+        promptTokens: params.promptTokens ?? undefined,
+        completionTokens: params.completionTokens ?? undefined,
+        totalTokens: params.totalTokens ?? undefined,
+      },
+      select: { id: true },
+    });
+
+    return result.id;
+  }
+
+  private toJsonInput(value: unknown): Prisma.InputJsonValue {
+    return JSON.parse(JSON.stringify(value ?? null)) as Prisma.InputJsonValue;
   }
 
   /**
@@ -688,6 +841,7 @@ export class ArtifactAnalysisService {
       effectiveRolls: number;
     },
     aiAnalysis: any,
+    language?: string,
   ): ArtifactAnalysisResult {
     // Use AI values if available, otherwise fall back to algorithmic
     const finalScore = aiAnalysis?.overallScore ?? algorithmicScore.score;
@@ -715,10 +869,10 @@ export class ArtifactAnalysisService {
     }
 
     // Generate recommendations
-    const recommendations = this.generateRecommendations(artifact, algorithmicScore);
+    const recommendations = this.generateRecommendations(artifact, algorithmicScore, language);
 
     // Default suitable characters based on stats
-    const suitableCharacters = aiAnalysis?.suitableCharacters || this.suggestCharacters(artifact);
+    const suitableCharacters = aiAnalysis?.suitableCharacters || this.suggestCharacters(artifact, language);
 
     return {
       artifactId,
@@ -726,7 +880,7 @@ export class ArtifactAnalysisService {
       grade: finalGrade,
       mainStatAnalysis: aiAnalysis?.mainStatAnalysis || {
         rating: mainStatRating,
-        comment: this.getMainStatComment(artifact.slot, artifact.mainStat, mainStatRating),
+        comment: this.getMainStatComment(artifact.slot, artifact.mainStat, mainStatRating, language),
       },
       subStatAnalysis: aiAnalysis?.subStatAnalysis || {
         critValue: algorithmicScore.critValue,
@@ -739,7 +893,7 @@ export class ArtifactAnalysisService {
         currentTier: this.scoreTier(finalScore),
         upgradePriority: finalScore >= 50 ? 'high' : finalScore >= 30 ? 'medium' : 'low',
         expectedScoreAt20: artifact.level < 20 ? Math.min(finalScore + 15, 100) : undefined,
-        reasoning: this.getPotentialReasoning(artifact, algorithmicScore),
+        reasoning: this.getPotentialReasoning(artifact, algorithmicScore, language),
       },
       suitableCharacters,
       recommendations,
@@ -756,6 +910,7 @@ export class ArtifactAnalysisService {
       algorithmicScore: { score: number; grade: 'S' | 'A' | 'B' | 'C' | 'D'; critValue: number; effectiveRolls: number };
     })[],
     aiAnalysis: any,
+    language?: string,
   ): BatchAnalysisResult {
     // Build artifact summaries
     const artifacts: BatchArtifactSummary[] = scoredArtifacts.map((a, index) => {
@@ -767,8 +922,8 @@ export class ArtifactAnalysisService {
         score: aiItem?.score ?? a.algorithmicScore.score,
         grade: aiItem?.grade ?? a.algorithmicScore.grade,
         tier: aiItem?.tier ?? this.scoreTier(a.algorithmicScore.score),
-        keyStrength: aiItem?.keyStrength ?? this.getKeyStrength(a),
-        keyWeakness: aiItem?.keyWeakness ?? this.getKeyWeakness(a),
+        keyStrength: aiItem?.keyStrength ?? this.getKeyStrength(a, language),
+        keyWeakness: aiItem?.keyWeakness ?? this.getKeyWeakness(a, language),
       };
     });
 
@@ -791,10 +946,10 @@ export class ArtifactAnalysisService {
       setAnalysis: aiAnalysis?.setAnalysis || {
         completeSets,
         recommendation: completeSets.length > 0
-          ? `Prioritize ${completeSets[0]} for set bonus`
-          : 'No complete sets available',
+          ? this.t(language, `Prioritize ${completeSets[0]} for set bonus`, `优先考虑${completeSets[0]}来触发套装效果`)
+          : this.t(language, 'No complete sets available', '暂无可用的完整套装'),
       },
-      overallSuggestion: aiAnalysis?.overallSuggestion || this.generateOverallSuggestion(sorted),
+      overallSuggestion: aiAnalysis?.overallSuggestion || this.generateOverallSuggestion(sorted, language),
       analyzedAt: new Date().toISOString(),
     };
   }
@@ -802,77 +957,106 @@ export class ArtifactAnalysisService {
   /**
    * Get key strength of artifact
    */
-  private getKeyStrength(artifact: ArtifactForAnalysis): string {
+  private getKeyStrength(artifact: ArtifactForAnalysis, language?: string): string {
     const cv = this.calculateCritValue(artifact.subStats);
-    if (cv >= 30) return 'High crit value';
-    if (cv >= 20) return 'Good crit stats';
+    if (cv >= 30) return this.t(language, 'High crit value', '高暴击值');
+    if (cv >= 20) return this.t(language, 'Good crit stats', '暴击属性优秀');
 
     const hasER = artifact.subStats.some((s) => s.stat === 'ER%' || s.stat === 'Energy Recharge%');
-    if (hasER) return 'Energy Recharge for burst uptime';
+    if (hasER) return this.t(language, 'Energy Recharge for burst uptime', '有利于保证大招循环的充能效率');
 
     const hasEM = artifact.subStats.some((s) => s.stat === 'EM' || s.stat === 'Elemental Mastery');
-    if (hasEM) return 'Elemental Mastery for reactions';
+    if (hasEM) return this.t(language, 'Elemental Mastery for reactions', '元素精通适合反应队');
 
-    return 'Balanced stats';
+    return this.t(language, 'Balanced stats', '副词条比较均衡');
   }
 
   /**
    * Get key weakness of artifact
    */
-  private getKeyWeakness(artifact: ArtifactForAnalysis): string {
+  private getKeyWeakness(artifact: ArtifactForAnalysis, language?: string): string {
     const weakStats = ['DEF', 'HP', 'DEF%', 'HP%'];
     const wastedRolls = artifact.subStats.filter((s) => weakStats.includes(s.stat));
 
     if (wastedRolls.length >= 2) {
-      return 'Multiple defensive stats';
+      return this.t(language, 'Multiple defensive stats', '防御向词条较多');
     }
     if (wastedRolls.length === 1) {
-      return `${wastedRolls[0].stat} taking roll space`;
+      return this.t(
+        language,
+        `${wastedRolls[0].stat} taking roll space`,
+        `${wastedRolls[0].stat} 占用了有效词条`,
+      );
     }
 
     const cv = this.calculateCritValue(artifact.subStats);
     if (cv < 10) {
-      return 'No crit stats';
+      return this.t(language, 'No crit stats', '缺少暴击词条');
     }
 
-    return 'none';
+    return this.t(language, 'none', '暂无明显短板');
   }
 
   /**
    * Generate overall suggestion for batch
    */
-  private generateOverallSuggestion(sorted: BatchArtifactSummary[]): string {
+  private generateOverallSuggestion(sorted: BatchArtifactSummary[], language?: string): string {
     const topArtifact = sorted[0];
     const fodderCount = sorted.filter((a) => a.tier === 'fodder').length;
 
     if (fodderCount === sorted.length) {
-      return 'All artifacts are below average. Continue farming for better pieces.';
+      return this.t(
+        language,
+        'All artifacts are below average. Continue farming for better pieces.',
+        '当前圣遗物整体偏弱，建议继续刷取更好的部件。',
+      );
     }
 
     if (topArtifact.grade === 'S' || topArtifact.grade === 'A') {
-      return `Best piece is a ${topArtifact.grade}-tier artifact. Consider upgrading it first.`;
+      return this.t(
+        language,
+        `Best piece is a ${topArtifact.grade}-tier artifact. Consider upgrading it first.`,
+        `最好的部件为 ${topArtifact.grade} 级，建议优先强化它。`,
+      );
     }
 
-    return `Focus on upgrading the top ${Math.min(3, sorted.length)} pieces while farming for replacements.`;
+    return this.t(
+      language,
+      `Focus on upgrading the top ${Math.min(3, sorted.length)} pieces while farming for replacements.`,
+      `建议先强化前 ${Math.min(3, sorted.length)} 件，同时继续刷取替换。`,
+    );
   }
 
   /**
    * Generate main stat comment
    */
-  private getMainStatComment(slot: ArtifactSlot, mainStat: string, rating: string): string {
+  private getMainStatComment(
+    slot: ArtifactSlot,
+    mainStat: string,
+    rating: string,
+    language?: string,
+  ): string {
     if (slot === 'FLOWER' || slot === 'PLUME') {
-      return `${mainStat} is the fixed main stat for ${slot}`;
+      return this.t(
+        language,
+        `${mainStat} is the fixed main stat for ${slot}`,
+        `${slot}位主词条固定为 ${mainStat}`,
+      );
     }
 
     switch (rating) {
       case 'optimal':
-        return `${mainStat} is an optimal main stat for ${slot}`;
+        return this.t(
+          language,
+          `${mainStat} is an optimal main stat for ${slot}`,
+          `${slot}位的最佳主词条之一是 ${mainStat}`,
+        );
       case 'good':
-        return `${mainStat} is a good choice for most builds`;
+        return this.t(language, `${mainStat} is a good choice for most builds`, `${mainStat} 适用于多数配装`);
       case 'acceptable':
-        return `${mainStat} works for specific builds`;
+        return this.t(language, `${mainStat} works for specific builds`, `${mainStat} 更适合特定配装`);
       default:
-        return `${mainStat} is not ideal for most characters`;
+        return this.t(language, `${mainStat} is not ideal for most characters`, `${mainStat} 对多数角色并不理想`);
     }
   }
 
@@ -882,9 +1066,14 @@ export class ArtifactAnalysisService {
   private getPotentialReasoning(
     artifact: ArtifactForAnalysis,
     score: { score: number; critValue: number; effectiveRolls: number },
+    language?: string,
   ): string {
     if (artifact.level === 20) {
-      return `Fully upgraded. CV: ${score.critValue}, effective rolls: ${score.effectiveRolls}`;
+      return this.t(
+        language,
+        `Fully upgraded. CV: ${score.critValue}, effective rolls: ${score.effectiveRolls}`,
+        `已满级。暴击值：${score.critValue}，有效词条：${score.effectiveRolls}`,
+      );
     }
 
     const remainingUpgrades = Math.floor((20 - artifact.level) / 4);
@@ -893,9 +1082,17 @@ export class ArtifactAnalysisService {
     );
 
     if (hasCrit) {
-      return `${remainingUpgrades} upgrades remaining with crit stats to roll into`;
+      return this.t(
+        language,
+        `${remainingUpgrades} upgrades remaining with crit stats to roll into`,
+        `还有 ${remainingUpgrades} 次强化，有暴击词条可期待提升`,
+      );
     }
-    return `${remainingUpgrades} upgrades remaining. Limited upside without crit stats`;
+    return this.t(
+      language,
+      `${remainingUpgrades} upgrades remaining. Limited upside without crit stats`,
+      `还有 ${remainingUpgrades} 次强化，但缺少暴击词条，上限有限`,
+    );
   }
 
   /**
@@ -904,24 +1101,25 @@ export class ArtifactAnalysisService {
   private generateRecommendations(
     artifact: ArtifactForAnalysis,
     score: { score: number; critValue: number },
+    language?: string,
   ): string[] {
     const recommendations: string[] = [];
 
     if (artifact.level < 20 && score.score >= 30) {
-      recommendations.push('Upgrade to +20 to unlock full potential');
+      recommendations.push(this.t(language, 'Upgrade to +20 to unlock full potential', '建议升到 +20 释放全部潜力'));
     }
 
     if (score.critValue < 20) {
-      recommendations.push('Look for artifacts with higher crit value');
+      recommendations.push(this.t(language, 'Look for artifacts with higher crit value', '建议寻找更高暴击值的替代品'));
     }
 
     const tier = this.scoreTier(score.score);
     if (tier === 'fodder') {
-      recommendations.push('Consider using as upgrade material');
+      recommendations.push(this.t(language, 'Consider using as upgrade material', '可以考虑作为强化材料'));
     } else if (tier === 'transitional') {
-      recommendations.push('Good placeholder while farming better pieces');
+      recommendations.push(this.t(language, 'Good placeholder while farming better pieces', '可作为过渡装继续刷取'));
     } else {
-      recommendations.push('Strong endgame piece, worth keeping');
+      recommendations.push(this.t(language, 'Strong endgame piece, worth keeping', '优秀毕业向部件，值得保留'));
     }
 
     return recommendations;
@@ -930,7 +1128,7 @@ export class ArtifactAnalysisService {
   /**
    * Suggest suitable characters based on artifact stats
    */
-  private suggestCharacters(artifact: ArtifactForAnalysis): string[] {
+  private suggestCharacters(artifact: ArtifactForAnalysis, language?: string): string[] {
     const suggestions: string[] = [];
 
     // Check for specific damage goblets
@@ -971,9 +1169,21 @@ export class ArtifactAnalysisService {
 
     // Fallback to generic DPS characters
     if (suggestions.length === 0) {
-      suggestions.push('Most DPS characters', 'Check build guides');
+      suggestions.push(
+        this.t(language, 'Most DPS characters', '多数主C都可使用'),
+        this.t(language, 'Check build guides', '可参考配装攻略'),
+      );
     }
 
     return suggestions.slice(0, 3);
+  }
+
+  private t(language: string | undefined, en: string, zh: string): string {
+    return this.normalizeLanguage(language) === 'en' ? en : zh;
+  }
+
+  private normalizeLanguage(language?: string): 'en' | 'zh' {
+    if (language?.toLowerCase().startsWith('en')) return 'en';
+    return 'zh';
   }
 }

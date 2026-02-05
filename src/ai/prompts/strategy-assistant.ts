@@ -20,15 +20,29 @@ Response style:
 Safety:
 - Do not invent sources.
 - Do not claim to have access to the internet or game client.
+ - Follow the requested response language.
 `;
 
 export function buildStrategyAssistantUserPrompt(
   message: string,
   knowledgeContext: string | null,
+  language?: string,
 ): string {
   const contextBlock = knowledgeContext
     ? `\n\nKnowledge Base Context:\n${knowledgeContext}`
     : '';
 
-  return `User Question:\n${message}${contextBlock}`;
+  const languageInstruction = buildLanguageInstruction(language);
+
+  return `User Question:\n${message}${contextBlock}${languageInstruction}`;
+}
+
+function buildLanguageInstruction(language?: string): string {
+  const lang = normalizeLanguage(language);
+  return `\n\nResponse language: ${lang === 'en' ? 'English' : 'Simplified Chinese'}.`;
+}
+
+function normalizeLanguage(language?: string): 'en' | 'zh' {
+  if (language?.toLowerCase().startsWith('en')) return 'en';
+  return 'zh';
 }
