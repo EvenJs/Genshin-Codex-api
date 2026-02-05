@@ -8,6 +8,7 @@ import {
 } from '@nestjs/swagger';
 import { Response } from 'express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { OptionalJwtAuthGuard } from '../auth/optional-jwt-auth.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
 import { JwtPayload } from '../auth/jwt.strategy';
 import { StrategyAssistantService } from './strategy-assistant/strategy-assistant.service';
@@ -16,8 +17,6 @@ import { AiFeedbackService } from './ai-feedback.service';
 import { AiFeedbackDto } from './dto/ai-feedback.dto';
 
 @ApiTags('AI Chat')
-@ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
 @Controller('ai')
 export class AiController {
   constructor(
@@ -29,6 +28,7 @@ export class AiController {
     summary: 'Chat with the AI strategy assistant',
     description: 'Send a message and receive gameplay strategy guidance.',
   })
+  @UseGuards(OptionalJwtAuthGuard)
   @ApiBody({ type: AiChatDto })
   @ApiResponse({
     status: 200,
@@ -47,10 +47,11 @@ export class AiController {
   })
   @Post('chat')
   async chat(
-    @CurrentUser() user: JwtPayload,
+    @CurrentUser() user: JwtPayload | undefined,
     @Body() dto: AiChatDto,
     @Res() res: Response,
   ) {
+    const userId = user?.userId;
     if (dto.stream) {
       res.status(200);
       res.setHeader('Content-Type', 'text/event-stream');
@@ -60,7 +61,7 @@ export class AiController {
 
       try {
         for await (const event of this.strategyAssistant.chatStream(
-          user.userId,
+          userId,
           dto.message,
           dto.conversationId,
           dto.language,
@@ -80,7 +81,7 @@ export class AiController {
     }
 
     const response = await this.strategyAssistant.chat(
-      user.userId,
+      userId,
       dto.message,
       dto.conversationId,
       dto.language,
@@ -93,6 +94,8 @@ export class AiController {
     summary: 'Submit feedback for an AI result',
     description: 'Attach a rating and optional comments to a specific AI output.',
   })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @ApiBody({ type: AiFeedbackDto })
   @ApiResponse({
     status: 200,

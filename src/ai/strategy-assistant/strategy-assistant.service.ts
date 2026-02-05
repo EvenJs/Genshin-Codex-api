@@ -45,12 +45,15 @@ export class StrategyAssistantService {
   ) {}
 
   async chat(
-    userId: string,
+    userId: string | undefined,
     message: string,
     conversationId?: string,
     language?: string,
   ): Promise<AiChatResponse> {
-    const { conversation, id } = this.getOrCreateConversation(userId, conversationId);
+    const { conversation, id } = this.getOrCreateConversation(
+      userId ?? 'anonymous',
+      conversationId,
+    );
     const knowledge = await this.knowledgeService.getKnowledgeContext(message);
 
     const aiAvailable = await this.aiService.isAvailable();
@@ -65,20 +68,22 @@ export class StrategyAssistantService {
     if (!aiAvailable) {
       const fallback = this.buildFallbackResponse(message, knowledge.context, language);
       this.addMessage(conversation, { role: 'assistant', content: fallback });
-      const aiResultId = await this.saveAiResult({
-        userId,
-        conversationId: id,
-        input: {
-          message,
-          knowledgeUsed: knowledge.hasResults,
-        },
-        output: {
-          response: fallback,
-          knowledgeUsed: knowledge.hasResults,
-        },
-        aiGenerated: false,
-        language,
-      });
+      const aiResultId = userId
+        ? await this.saveAiResult({
+            userId,
+            conversationId: id,
+            input: {
+              message,
+              knowledgeUsed: knowledge.hasResults,
+            },
+            output: {
+              response: fallback,
+              knowledgeUsed: knowledge.hasResults,
+            },
+            aiGenerated: false,
+            language,
+          })
+        : undefined;
       return {
         conversationId: id,
         response: fallback,
@@ -90,31 +95,41 @@ export class StrategyAssistantService {
     }
 
     try {
-      const response = await this.aiService.chatForUser(userId, {
-        messages: llmMessages,
-        temperature: 0.4,
-      });
+      const response = userId
+        ? await this.aiService.chatForUser(userId, {
+            messages: llmMessages,
+            temperature: 0.4,
+          })
+        : await this.aiService.chat(
+            {
+              messages: llmMessages,
+              temperature: 0.4,
+            },
+            true,
+          );
 
       this.addMessage(conversation, { role: 'assistant', content: response.content });
 
-      const aiResultId = await this.saveAiResult({
-        userId,
-        conversationId: id,
-        input: {
-          message,
-          knowledgeUsed: knowledge.hasResults,
-        },
-        output: {
-          response: response.content,
-          knowledgeUsed: knowledge.hasResults,
-        },
-        aiGenerated: true,
-        language,
-        model: response.model ?? null,
-        promptTokens: response.promptTokens ?? null,
-        completionTokens: response.completionTokens ?? null,
-        totalTokens: response.totalTokens ?? null,
-      });
+      const aiResultId = userId
+        ? await this.saveAiResult({
+            userId,
+            conversationId: id,
+            input: {
+              message,
+              knowledgeUsed: knowledge.hasResults,
+            },
+            output: {
+              response: response.content,
+              knowledgeUsed: knowledge.hasResults,
+            },
+            aiGenerated: true,
+            language,
+            model: response.model ?? null,
+            promptTokens: response.promptTokens ?? null,
+            completionTokens: response.completionTokens ?? null,
+            totalTokens: response.totalTokens ?? null,
+          })
+        : undefined;
 
       return {
         conversationId: id,
@@ -128,20 +143,22 @@ export class StrategyAssistantService {
       this.logger.warn(`AI chat failed: ${error instanceof Error ? error.message : error}`);
       const fallback = this.buildFallbackResponse(message, knowledge.context, language);
       this.addMessage(conversation, { role: 'assistant', content: fallback });
-      const aiResultId = await this.saveAiResult({
-        userId,
-        conversationId: id,
-        input: {
-          message,
-          knowledgeUsed: knowledge.hasResults,
-        },
-        output: {
-          response: fallback,
-          knowledgeUsed: knowledge.hasResults,
-        },
-        aiGenerated: false,
-        language,
-      });
+      const aiResultId = userId
+        ? await this.saveAiResult({
+            userId,
+            conversationId: id,
+            input: {
+              message,
+              knowledgeUsed: knowledge.hasResults,
+            },
+            output: {
+              response: fallback,
+              knowledgeUsed: knowledge.hasResults,
+            },
+            aiGenerated: false,
+            language,
+          })
+        : undefined;
       return {
         conversationId: id,
         response: fallback,
@@ -154,12 +171,15 @@ export class StrategyAssistantService {
   }
 
   async *chatStream(
-    userId: string,
+    userId: string | undefined,
     message: string,
     conversationId?: string,
     language?: string,
   ): AsyncGenerator<AiChatStreamEvent, void, unknown> {
-    const { conversation, id } = this.getOrCreateConversation(userId, conversationId);
+    const { conversation, id } = this.getOrCreateConversation(
+      userId ?? 'anonymous',
+      conversationId,
+    );
     const knowledge = await this.knowledgeService.getKnowledgeContext(message);
 
     const aiAvailable = await this.aiService.isAvailable();
@@ -183,20 +203,22 @@ export class StrategyAssistantService {
       const fallback = this.buildFallbackResponse(message, knowledge.context, language);
       this.addMessage(conversation, { role: 'assistant', content: fallback });
       yield { type: 'chunk', content: fallback };
-      const aiResultId = await this.saveAiResult({
-        userId,
-        conversationId: id,
-        input: {
-          message,
-          knowledgeUsed: knowledge.hasResults,
-        },
-        output: {
-          response: fallback,
-          knowledgeUsed: knowledge.hasResults,
-        },
-        aiGenerated: false,
-        language,
-      });
+      const aiResultId = userId
+        ? await this.saveAiResult({
+            userId,
+            conversationId: id,
+            input: {
+              message,
+              knowledgeUsed: knowledge.hasResults,
+            },
+            output: {
+              response: fallback,
+              knowledgeUsed: knowledge.hasResults,
+            },
+            aiGenerated: false,
+            language,
+          })
+        : undefined;
       yield { type: 'done', conversationId: id, aiResultId };
       return;
     }
@@ -204,10 +226,15 @@ export class StrategyAssistantService {
     let accumulated = '';
 
     try {
-      const stream = this.aiService.chatStreamForUser(userId, {
-        messages: llmMessages,
-        temperature: 0.4,
-      });
+      const stream = userId
+        ? this.aiService.chatStreamForUser(userId, {
+            messages: llmMessages,
+            temperature: 0.4,
+          })
+        : this.aiService.chatStream({
+            messages: llmMessages,
+            temperature: 0.4,
+          });
 
       for await (const chunk of stream) {
         if (chunk.content) {
@@ -221,20 +248,22 @@ export class StrategyAssistantService {
         : '抱歉，我无法生成有效回复，请稍后再试。';
 
       this.addMessage(conversation, { role: 'assistant', content: finalResponse });
-      const aiResultId = await this.saveAiResult({
-        userId,
-        conversationId: id,
-        input: {
-          message,
-          knowledgeUsed: knowledge.hasResults,
-        },
-        output: {
-          response: finalResponse,
-          knowledgeUsed: knowledge.hasResults,
-        },
-        aiGenerated: true,
-        language,
-      });
+      const aiResultId = userId
+        ? await this.saveAiResult({
+            userId,
+            conversationId: id,
+            input: {
+              message,
+              knowledgeUsed: knowledge.hasResults,
+            },
+            output: {
+              response: finalResponse,
+              knowledgeUsed: knowledge.hasResults,
+            },
+            aiGenerated: true,
+            language,
+          })
+        : undefined;
       yield { type: 'done', conversationId: id, aiResultId };
     } catch (error) {
       const messageText = error instanceof Error ? error.message : 'AI streaming failed';
