@@ -123,6 +123,7 @@ model ArtifactSet {
   twoPieceBonus  String // 2件套效果
   fourPieceBonus String? // 4件套效果 (部分套装没有)
   imageUrl       String?
+  orderIndex     Int      @default(0)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
@@ -131,6 +132,7 @@ model ArtifactSet {
   secondarySetBuilds ArtifactBuild[] @relation("SecondarySet")
 
   @@index([name])
+  @@index([orderIndex])
 }
 
 model UserArtifact {

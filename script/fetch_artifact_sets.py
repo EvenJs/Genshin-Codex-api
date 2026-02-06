@@ -254,6 +254,7 @@ def main():
 
     name_to_id = _load_existing_id_map(existing_file)
     result = []
+    order_index = 0
 
     for row in rows:
         name = _parse_name(row)
@@ -271,15 +272,26 @@ def main():
         result.append(
             {
                 "id": artifact_id,
-                "imgUrl": img_url,
+                "imageUrl": img_url,
                 "name": name,
                 "rarity": rarity,
                 "twoPieceBonus": two_piece,
                 "fourPieceBonus": four_piece,
                 "tags": tags,
                 "sourceUrl": f"https://wiki.biligame.com/ys/{quote(name, safe='')}",
+                "_orderIndex": order_index,
             }
         )
+        order_index += 1
+
+    def _rarity_key(item):
+        r = item.get("rarity") or []
+        max_r = max(r) if r else 0
+        return (-max_r, item.get("_orderIndex", 0))
+
+    result.sort(key=_rarity_key)
+    for item in result:
+        item.pop("_orderIndex", None)
 
     with open(out_file, "w", encoding="utf-8") as f:
         json.dump(result, f, ensure_ascii=False, indent=2)

@@ -45,6 +45,7 @@ type ArtifactSetSeed = {
   twoPieceBonus: string;
   fourPieceBonus?: string | null;
   imageUrl?: string | null;
+  orderIndex?: number | null;
 };
 
 const prisma = new PrismaClient();
@@ -144,15 +145,17 @@ async function seedArtifactSets() {
   }
 
   await prisma.$transaction(
-    artifactSets.map((s) =>
-      prisma.artifactSet.upsert({
+    artifactSets.map((s, index) => {
+      const orderIndex = s.orderIndex ?? index;
+      return prisma.artifactSet.upsert({
         where: { id: s.id },
         update: {
           name: s.name,
           rarity: s.rarity,
           twoPieceBonus: s.twoPieceBonus,
           fourPieceBonus: s.fourPieceBonus ?? null,
-          imageUrl: s.imageUrl ?? null
+          imageUrl: s.imageUrl ?? null,
+          orderIndex
         },
         create: {
           id: s.id,
@@ -160,10 +163,11 @@ async function seedArtifactSets() {
           rarity: s.rarity,
           twoPieceBonus: s.twoPieceBonus,
           fourPieceBonus: s.fourPieceBonus ?? null,
-          imageUrl: s.imageUrl ?? null
+          imageUrl: s.imageUrl ?? null,
+          orderIndex
         }
       })
-    )
+    })
   );
 
   console.log(`Seeded artifact sets: ${artifactSets.length}`);

@@ -55,7 +55,7 @@ describe('ArtifactSetsService', () => {
 
       expect(result).toEqual(mockArtifactSets);
       expect(mockPrismaService.artifactSet.findMany).toHaveBeenCalledWith({
-        orderBy: { name: 'asc' },
+        orderBy: [{ orderIndex: 'asc' }, { name: 'asc' }],
         select: {
           id: true,
           name: true,

@@ -7,7 +7,7 @@ export class ArtifactSetsService {
 
   async findAll() {
     return this.prisma.artifactSet.findMany({
-      orderBy: { name: 'asc' },
+      orderBy: [{ orderIndex: 'asc' }, { name: 'asc' }],
       select: {
         id: true,
         name: true,
