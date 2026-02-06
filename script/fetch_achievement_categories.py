@@ -3,13 +3,15 @@ import json
 import re
 import time
 import html as html_lib
+from pathlib import Path
 from urllib.parse import urljoin
 from urllib.request import Request, build_opener, HTTPCookieProcessor
 from urllib.error import HTTPError
 
 URL = "https://wiki.biligame.com/ys/%E6%88%90%E5%B0%B1%E7%B3%BB%E7%BB%9F"
 BASE = "https://wiki.biligame.com"
-OUT_PATH = "Genshin-Codex-api/prisma/seed-data/achievementCategories.json"
+SCRIPT_DIR = Path(__file__).parent
+OUT_PATH = SCRIPT_DIR.parent / "prisma" / "seed-data" / "achievementCategories.json"
 
 OPENER = build_opener(HTTPCookieProcessor())
 JINA_PREFIX = "https://r.jina.ai/http://"
